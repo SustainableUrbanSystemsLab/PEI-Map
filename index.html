@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEI National Dashboard</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css"
+        rel="stylesheet" />
+    <!-- Mapbox GL Geocoder -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --sb: 275px;
+            --bg: #0d1117;
+            --panel: #161b27;
+            --card: #1e2535;
+            --bdr: #2a3148;
+            --acc: #00d4aa;
+            --txt: #e2e8f0;
+            --mut: #64748b
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--txt);
+            height: 100vh;
+            overflow: hidden;
+            display: flex
+        }
+
+        #sb {
+            width: var(--sb);
+            min-width: var(--sb);
+            background: var(--panel);
+            border-right: 1px solid var(--bdr);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 10
+        }
+
+        .sbh {
+            padding: 16px 14px 12px;
+            border-bottom: 1px solid var(--bdr);
+            background: linear-gradient(135deg, #161b27, #1e2535)
+        }
+
+        .sbh h1 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--acc)
+        }
+
+        .sbh p {
+            font-size: 10px;
+            color: var(--mut);
+            margin-top: 3px
+        }
+
+        .sec {
+            padding: 11px 13px;
+            border-bottom: 1px solid var(--bdr)
+        }
+
+        .lbl {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--mut);
+            margin-bottom: 7px
+        }
+
+        .sub-lbl {
+            font-size: 9px;
+            color: var(--mut);
+            margin: 8px 0 4px
+        }
+
+        .br {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap
+        }
+
+        .btn {
+            flex: 1;
+            padding: 5px 5px;
+            border: 1px solid var(--bdr);
+            background: var(--card);
+            color: var(--mut);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 500;
+            transition: all .15s;
+            text-align: center;
+            font-family: inherit;
+            white-space: nowrap
+        }
+
+        .btn:hover {
+            border-color: var(--acc);
+            color: var(--acc)
+        }
+
+        .btn.on {
+            background: var(--acc);
+            border-color: var(--acc);
+            color: #0d1117;
+            font-weight: 700
+        }
+
+        select {
+            width: 100%;
+            padding: 6px 8px;
+            background: var(--card);
+            border: 1px solid var(--bdr);
+            border-radius: 6px;
+            color: var(--txt);
+            font-size: 11px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none
+        }
+
+        select:focus {
+            border-color: var(--acc)
+        }
+
+        .hint {
+            font-size: 9px;
+            color: var(--mut);
+            margin-top: 5px;
+            line-height: 1.4
+        }
+
+        .srow {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        input[type=range] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 3px;
+            background: var(--bdr);
+            border-radius: 2px;
+            outline: none
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 13px;
+            height: 13px;
+            background: var(--acc);
+            border-radius: 50%;
+            cursor: pointer
+        }
+
+        .sv {
+            font-size: 10px;
+            color: var(--mut);
+            min-width: 28px;
+            text-align: right
+        }
+
+        #mw {
+            flex: 1;
+            position: relative;
+            overflow: hidden
+        }
+
+        #map,
+        #cmp {
+            position: absolute;
+            inset: 0
+        }
+
+        #cmp {
+            display: none
+        }
+
+        #before-map,
+        #after-map {
+            position: absolute;
+            inset: 0
+        }
+
+        .fp {
+            position: absolute;
+            background: rgba(22, 27, 39, .93);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--bdr);
+            border-radius: 10px;
+            padding: 11px 13px;
+            font-size: 11px;
+            z-index: 5
+        }
+
+        #stats {
+            top: 12px;
+            right: 12px;
+            min-width: 155px
+        }
+
+        #stats .pt {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--acc);
+            margin-bottom: 7px
+        }
+
+        .sr {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 3px
+        }
+
+        .sk {
+            color: var(--mut)
+        }
+
+        .sv2 {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums
+        }
+
+        #legend {
+            bottom: 28px;
+            right: 12px;
+            min-width: 200px
+        }
+
+        #legend .pt {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--acc);
+            margin-bottom: 7px
+        }
+
+        .lb {
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 4px
+        }
+
+        .ll {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: var(--mut)
+        }
+
+        .mapboxgl-popup-content {
+            background: var(--panel) !important;
+            border: 1px solid var(--bdr) !important;
+            border-radius: 10px !important;
+            padding: 0 !important;
+            color: var(--txt) !important;
+            max-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .6) !important
+        }
+
+        .mapboxgl-popup-close-button {
+            color: var(--mut) !important;
+            font-size: 16px !important;
+            right: 7px !important;
+            top: 5px !important
+        }
+
+        .ph {
+            background: var(--card);
+            padding: 11px 13px;
+            border-radius: 10px 10px 0 0;
+            border-bottom: 1px solid var(--bdr)
+        }
+
+        .pid {
+            font-size: 10px;
+            color: var(--mut)
+        }
+
+        .ploc {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 2px
+        }
+
+        .pb {
+            padding: 10px 13px 12px
+        }
+
+        .pst {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--acc);
+            margin: 8px 0 5px
+        }
+
+        .pgr {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px 8px
+        }
+
+        .pr {
+            display: flex;
+            justify-content: space-between
+        }
+
+        .pk {
+            color: var(--mut);
+            font-size: 10px
+        }
+
+        .pv {
+            font-weight: 600;
+            font-size: 10px;
+            font-variant-numeric: tabular-nums
+        }
+
+        .pbar-row {
+            margin-bottom: 6px
+        }
+
+        .pbar-h {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px
+        }
+
+        .pbar-bg {
+            height: 5px;
+            background: var(--card);
+            border-radius: 3px;
+            overflow: hidden
+        }
+
+        .pbar-f {
+            height: 100%;
+            border-radius: 3px
+        }
+
+        /* Timeline table */
+        .tl-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 4px
+        }
+
+        .tl-table th {
+            color: var(--mut);
+            font-weight: 600;
+            padding: 2px 4px;
+            text-align: center;
+            font-size: 9px
+        }
+
+        .tl-table td {
+            padding: 3px 4px;
+            text-align: center;
+            font-variant-numeric: tabular-nums
+        }
+
+        .tl-table tr:nth-child(even) td {
+            background: rgba(0, 0, 0, .15);
+            border-radius: 4px
+        }
+
+        .tl-yr {
+            color: var(--mut);
+            text-align: left !important
+        }
+
+        #ld {
+            position: absolute;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 20;
+            transition: opacity .4s
+        }
+
+        #ld.gone {
+            opacity: 0;
+            pointer-events: none
+        }
+
+        .spin {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--bdr);
+            border-top-color: var(--acc);
+            border-radius: 50%;
+            animation: sp .7s linear infinite;
+            margin-bottom: 10px
+        }
+
+        @keyframes sp {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        #ld p {
+            color: var(--mut);
+            font-size: 12px
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sb">
+        <div class="sbh">
+            <h1>🗺&nbsp; PEI Dashboard</h1>
+            <p>Pedestrian Environment Index · Nationwide</p>
+        </div>
+
+        <!-- MODE -->
+        <div class="sec">
+            <div class="lbl">View Mode</div>
+            <div class="br">
+                <button class="btn on" id="m-single" onclick="setMode('single')">Single</button>
+                <button class="btn" id="m-diff" onclick="setMode('diff')">PEI Diff</button>
+            </div>
+            <div class="br" style="margin-top:4px">
+                <button class="btn" id="m-pswipe" onclick="setMode('pswipe')">⇔ PEI Swipe</button>
+                <button class="btn" id="m-yswipe" onclick="setMode('yswipe')">⇔ Year Swipe</button>
+            </div>
+        </div>
+
+        <!-- YEAR (single + diff modes) -->
+        <div class="sec" id="ctl-year">
+            <div class="lbl">Year</div>
+            <div class="br">
+                <button class="btn on" id="y-2013" onclick="setYear('2013')">2013</button>
+                <button class="btn" id="y-2017" onclick="setYear('2017')">2017</button>
+                <button class="btn" id="y-2022" onclick="setYear('2022')">2022</button>
+            </div>
+        </div>
+
+        <!-- SINGLE controls -->
+        <div class="sec" id="ctl-single">
+            <div class="lbl">Layer Display</div>
+            <select id="pei-sel" onchange="updateLayer()">
+                <option value="PEI_original">PEI Original (CDI·IDI·LDI·PDI)</option>
+                <option value="PEI_new">PEI New (RSI·GSI·BI·PTAL)</option>
+                <option value="PEI_combined">PEI Combined (All 8)</option>
+                <optgroup label="Original Indices">
+                    <option value="CDI">Commercial Density (CDI)</option>
+                    <option value="IDI">Intersection Density (IDI)</option>
+                    <option value="LDI">Land Use Diversity (LDI)</option>
+                    <option value="PDI">Population Density (PDI)</option>
+                </optgroup>
+                <optgroup label="New Indices">
+                    <option value="RSI">Road Safety (RSI)</option>
+                    <option value="GSI">Green Space (GSI)</option>
+                    <option value="BI">Bike Infrastructure (BI)</option>
+                    <option value="PTAL">Public Transit Access (PTAL)</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <!-- PEI DIFF controls -->
+        <div class="sec" id="ctl-diff" style="display:none">
+            <div class="lbl">Compare</div>
+            <select id="diff-sel" onchange="updateLayer()">
+                <option value="orig-new">Original − New</option>
+                <option value="orig-comb">Original − Combined</option>
+            </select>
+            <p class="hint">🟢 Green = new indices improve score<br>🔴 Red = new indices reduce score</p>
+        </div>
+
+        <!-- PEI SWIPE controls -->
+        <div class="sec" id="ctl-pswipe" style="display:none">
+            <div class="lbl">Year</div>
+            <div class="br" id="ps-yr-btns">
+                <button class="btn on" id="ps-2013" onclick="setPSwipeYear('2013')">2013</button>
+                <button class="btn" id="ps-2017" onclick="setPSwipeYear('2017')">2017</button>
+                <button class="btn" id="ps-2022" onclick="setPSwipeYear('2022')">2022</button>
+            </div>
+            <div class="sub-lbl">Left Map</div>
+            <select id="left-pei" onchange="updateSplit()">
+                <option value="PEI_original">PEI Original</option>
+                <option value="PEI_new">PEI New</option>
+                <option value="PEI_combined">PEI Combined</option>
+                <optgroup label="Original Indices">
+                    <option value="CDI">CDI</option>
+                    <option value="IDI">IDI</option>
+                    <option value="LDI">LDI</option>
+                    <option value="PDI">PDI</option>
+                </optgroup>
+                <optgroup label="New Indices">
+                    <option value="RSI">RSI</option>
+                    <option value="GSI">GSI</option>
+                    <option value="BI">BI</option>
+                    <option value="PTAL">PTAL</option>
+                </optgroup>
+            </select>
+            <div class="sub-lbl">Right Map</div>
+            <select id="right-pei" onchange="updateSplit()">
+                <option value="PEI_new">PEI New</option>
+                <option value="PEI_original">PEI Original</option>
+                <option value="PEI_combined">PEI Combined</option>
+                <optgroup label="Original Indices">
+                    <option value="CDI">CDI</option>
+                    <option value="IDI">IDI</option>
+                    <option value="LDI">LDI</option>
+                    <option value="PDI">PDI</option>
+                </optgroup>
+                <optgroup label="New Indices">
+                    <option value="RSI">RSI</option>
+                    <option value="GSI">GSI</option>
+                    <option value="BI">BI</option>
+                    <option value="PTAL">PTAL</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <!-- YEAR SWIPE controls -->
+        <div class="sec" id="ctl-yswipe" style="display:none">
+            <div class="lbl">Layer Display</div>
+            <select id="yswipe-pei" onchange="updateSplit()">
+                <option value="PEI_original">PEI Original</option>
+                <option value="PEI_new">PEI New</option>
+                <option value="PEI_combined">PEI Combined</option>
+                <optgroup label="Original Indices">
+                    <option value="CDI">CDI</option>
+                    <option value="IDI">IDI</option>
+                    <option value="LDI">LDI</option>
+                    <option value="PDI">PDI</option>
+                </optgroup>
+                <optgroup label="New Indices">
+                    <option value="RSI">RSI</option>
+                    <option value="GSI">GSI</option>
+                    <option value="BI">BI</option>
+                    <option value="PTAL">PTAL</option>
+                </optgroup>
+            </select>
+            <div class="sub-lbl">Left Year</div>
+            <select id="left-yr" onchange="updateSplit()">
+                <option value="2013">2013</option>
+                <option value="2017">2017</option>
+                <option value="2022">2022</option>
+            </select>
+            <div class="sub-lbl">Right Year</div>
+            <select id="right-yr" onchange="updateSplit()">
+                <option value="2022">2022</option>
+                <option value="2017">2017</option>
+                <option value="2013">2013</option>
+            </select>
+            <p class="hint" style="margin-top:6px">Drag the divider to compare years side by side at the same location.
+            </p>
+        </div>
+
+        <!-- BASEMAP -->
+        <div class="sec">
+            <div class="lbl">Basemap</div>
+            <div class="br">
+                <button class="btn on" id="b-light" onclick="setBase('light')">Light</button>
+                <button class="btn" id="b-dark" onclick="setBase('dark')">Dark</button>
+                <button class="btn" id="b-satellite" onclick="setBase('satellite')">Sat</button>
+                <button class="btn" id="b-streets" onclick="setBase('streets')">Streets</button>
+            </div>
+        </div>
+
+        <!-- OPACITY -->
+        <div class="sec">
+            <div class="lbl">Layer Opacity</div>
+            <div class="srow">
+                <input type="range" id="opa" min="0" max="100" value="80" oninput="setOpacity(this.value)">
+                <span class="sv" id="opa-v">80%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAP -->
+    <div id="mw">
+        <div id="ld">
+            <div class="spin"></div>
+            <p>Loading PEI tileset data…</p>
+        </div>
+        <div id="map"></div>
+        <div id="cmp">
+            <div id="before-map"></div>
+            <div id="after-map"></div>
+        </div>
+        <div class="fp" id="stats">
+            <div class="pt">Visible Tracts</div>
+            <div class="sr"><span class="sk">Count</span><span class="sv2" id="s-n">—</span></div>
+            <div class="sr"><span class="sk">Mean</span><span class="sv2" id="s-mean">—</span></div>
+            <div class="sr"><span class="sk">Min</span><span class="sv2" id="s-min">—</span></div>
+            <div class="sr"><span class="sk">Max</span><span class="sv2" id="s-max">—</span></div>
+        </div>
+        <div class="fp" id="legend">
+            <div class="pt" id="leg-t">PEI Original</div>
+            <div class="lb" id="leg-b"></div>
+            <div class="ll" id="leg-l"><span>0.0</span><span>0.5</span><span>1.0</span></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ════════════════════════ CONFIG ════════════════════════
+        const token = import.meta.env.VITE_MAPBOX_TOKEN || '';
+        if (!token) {
+            const loader = document.getElementById('ld');
+            if (loader) {
+                loader.innerHTML = '<p style="padding:16px;max-width:360px;text-align:center;color:#fca5a5">Missing VITE_MAPBOX_TOKEN. Add it in your .env file.</p>';
+            }
+            throw new Error('Missing VITE_MAPBOX_TOKEN');
+        }
+        mapboxgl.accessToken = token;
+
+        const TS = {
+            '2013': { url: 'mapbox://mdewitt33.8hxsrcd4', id: 'mdewitt33.8hxsrcd4', sl: null },
+            '2017': { url: 'mapbox://mdewitt33.bg9qdffy', id: 'mdewitt33.bg9qdffy', sl: null },
+            '2022': { url: 'mapbox://mdewitt33.4yj7jlgm', id: 'mdewitt33.4yj7jlgm', sl: null },
+        };
+
+        const BASES = {
+            light: 'mapbox://styles/mapbox/light-v11',
+            dark: 'mapbox://styles/mapbox/dark-v11',
+            satellite: 'mapbox://styles/mapbox/satellite-streets-v12',
+            streets: 'mapbox://styles/mapbox/streets-v12',
+        };
+
+        const PEI_GRAD = [0, '#d73027', 0.25, '#fc8d59', 0.5, '#ffffbf', 0.75, '#91cf60', 1, '#1a9850'];
+        const DIFF_GRAD = [-0.5, '#1a9850', -0.1, '#91cf60', 0, '#ffffbf', 0.1, '#fc8d59', 0.5, '#d73027'];
+        const PEI_LABELS = {
+            PEI_original: 'PEI Original', PEI_new: 'PEI New', PEI_combined: 'PEI Combined',
+            CDI: 'Commercial Density', IDI: 'Intersection Density', LDI: 'Land Use Diversity', PDI: 'Population Density',
+            RSI: 'Road Safety Index', GSI: 'Green Space Index', BI: 'Bike Infrastructure', PTAL: 'Public Transit Access'
+        };
+
+        // ════════════════════════ STATE ════════════════════════
+        let year = '2013', mode = 'single', base = 'light', opacity = 0.8;
+        let cmpObj = null, bMap = null, aMap = null, pSwipeYear = '2013';
+        let statsTimer = null;
+        const popup = new mapboxgl.Popup({ closeButton: true, closeOnClick: false, maxWidth: '320px' });
+
+        // ════════════════════════ SOURCE LAYER DETECTION ════════════════════════
+        async function detectSourceLayers() {
+            for (const [yr, ts] of Object.entries(TS)) {
+                try {
+                    const r = await fetch(`https://api.mapbox.com/v4/${ts.id}.json?access_token=${mapboxgl.accessToken}`);
+                    const meta = await r.json();
+                    const layers = meta.vector_layers || [];
+                    if (layers.length > 0) { ts.sl = layers[0].id; console.log(`✅ ${yr} → "${ts.sl}"`); }
+                    else console.warn(`❌ ${yr}: no vector_layers`, meta);
+                } catch (e) { console.error(`❌ ${yr}:`, e); }
+            }
+        }
+
+        // ════════════════════════ MAIN MAP ════════════════════════
+        const map = new mapboxgl.Map({ container: 'map', style: BASES.light, center: [-98.35, 39.5], zoom: 3.8, minZoom: 2 });
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+        // Add Geocoder
+        map.addControl(
+            new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                mapboxgl: mapboxgl,
+                marker: false,
+                placeholder: 'Search address or place...'
+            }),
+            'top-left'
+        );
+
+        // Add Scale Control
+        map.addControl(new mapboxgl.ScaleControl({ maxWidth: 200, unit: 'imperial' }), 'bottom-left');
+
+        map.on('load', async () => {
+            await detectSourceLayers();
+            if (!TS[year].sl) { console.error('Source layer detection failed'); document.getElementById('ld').classList.add('gone'); return; }
+
+            // Add active year layer
+            addLayers(map, year);
+
+            // Add background (opacity-0) layers for all years — needed for cross-year popup timeline
+            addBackgroundLayers(map);
+
+            map.on('idle', updateStats);
+            map.on('click', 'tracts-fill', onTractClick);
+            
+            // Hover highlight logic
+            map.on('mousemove', 'tracts-fill', (e) => {
+                if (e.features.length > 0) {
+                    map.setFilter('tracts-hover', ['==', 'GEOID', e.features[0].properties.GEOID]);
+                    map.getCanvas().style.cursor = 'pointer';
+                }
+            });
+            map.on('mouseleave', 'tracts-fill', () => {
+                map.setFilter('tracts-hover', ['==', 'GEOID', '']);
+                map.getCanvas().style.cursor = '';
+            });
+
+            updateLayer(); updateLegend();
+            document.getElementById('ld').classList.add('gone');
+        });
+
+        // ════════════════════════ LAYER MANAGEMENT ════════════════════════
+        function addLayers(m, yr) {
+            const ts = TS[yr];
+            if (!ts.sl) return;
+            ['tracts-fill', 'tracts-line', 'tracts-hover'].forEach(id => { if (m.getLayer(id)) m.removeLayer(id); });
+            if (m.getSource('src')) m.removeSource('src');
+            m.addSource('src', { type: 'vector', url: ts.url });
+            m.addLayer({
+                id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl,
+                paint: { 'fill-color': peiExpr('PEI_original'), 'fill-opacity': opacity }
+            });
+            m.addLayer({
+                id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl,
+                paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] }
+            });
+            m.addLayer({
+                id: 'tracts-hover', type: 'line', source: 'src', 'source-layer': ts.sl,
+                paint: { 'line-color': '#00d4aa', 'line-width': 2, 'line-opacity': 1 },
+                filter: ['==', 'GEOID', '']
+            });
+        }
+
+        function addBackgroundLayers(m) {
+            Object.entries(TS).forEach(([yr, ts]) => {
+                if (!ts.sl) return;
+                if (!m.getSource(`src-${yr}`)) m.addSource(`src-${yr}`, { type: 'vector', url: ts.url });
+                if (!m.getLayer(`bg-${yr}`)) m.addLayer({
+                    id: `bg-${yr}`, type: 'fill', source: `src-${yr}`, 'source-layer': ts.sl,
+                    paint: { 'fill-opacity': 0, 'fill-color': '#000' }
+                });
+            });
+        }
+
+        function peiExpr(col) { return ['interpolate', ['linear'], ['coalesce', ['get', col], 0], ...PEI_GRAD]; }
+        function diffExpr(c1, c2) { return ['interpolate', ['linear'], ['-', ['coalesce', ['get', c1], 0], ['coalesce', ['get', c2], 0]], ...DIFF_GRAD]; }
+
+        function updateLayer() {
+            if (!map.getLayer('tracts-fill')) return;
+            let expr;
+            if (mode === 'single') expr = peiExpr(document.getElementById('pei-sel').value);
+            else if (mode === 'diff') {
+                const d = document.getElementById('diff-sel').value;
+                expr = d === 'orig-new' ? diffExpr('PEI_original', 'PEI_new') : diffExpr('PEI_original', 'PEI_combined');
+            }
+            if (expr) map.setPaintProperty('tracts-fill', 'fill-color', expr);
+            map.setPaintProperty('tracts-fill', 'fill-opacity', opacity);
+            updateLegend(); updateStats();
+        }
+
+        // ════════════════════════ MODE ════════════════════════
+        function setMode(m) {
+            mode = m;
+            ['single', 'diff', 'pswipe', 'yswipe'].forEach(x => document.getElementById('m-' + x).classList.toggle('on', x === m));
+            document.getElementById('ctl-year').style.display = ['single', 'diff'].includes(m) ? '' : 'none';
+            document.getElementById('ctl-single').style.display = m === 'single' ? '' : 'none';
+            document.getElementById('ctl-diff').style.display = m === 'diff' ? '' : 'none';
+            document.getElementById('ctl-pswipe').style.display = m === 'pswipe' ? '' : 'none';
+            document.getElementById('ctl-yswipe').style.display = m === 'yswipe' ? '' : 'none';
+            document.getElementById('map').style.display = ['pswipe', 'yswipe'].includes(m) ? 'none' : '';
+            document.getElementById('cmp').style.display = ['pswipe', 'yswipe'].includes(m) ? 'block' : 'none';
+            document.getElementById('stats').style.display = ['pswipe', 'yswipe'].includes(m) ? 'none' : '';
+            if (['pswipe', 'yswipe'].includes(m)) { teardownSplit(); initSplit(); }
+            else { teardownSplit(); updateLayer(); }
+            updateLegend();
+        }
+
+        // ════════════════════════ YEAR ════════════════════════
+        function setYear(yr) {
+            year = yr;
+            ['2013', '2017', '2022'].forEach(y => document.getElementById('y-' + y).classList.toggle('on', y === yr));
+            addLayers(map, yr); updateLayer();
+        }
+        function setPSwipeYear(yr) {
+            pSwipeYear = yr;
+            ['2013', '2017', '2022'].forEach(y => document.getElementById('ps-' + y).classList.toggle('on', y === yr));
+            if (cmpObj) { teardownSplit(); initSplit(); }
+        }
+
+        // ════════════════════════ BASEMAP ════════════════════════
+        function setBase(b) {
+            base = b;
+            ['light', 'dark', 'satellite', 'streets'].forEach(x => document.getElementById('b-' + x).classList.toggle('on', x === b));
+            if (['pswipe', 'yswipe'].includes(mode)) { teardownSplit(); initSplit(); return; }
+            const c = map.getCenter(), z = map.getZoom();
+            map.once('style.load', () => { addLayers(map, year); addBackgroundLayers(map); map.setCenter(c); map.setZoom(z); });
+            map.setStyle(BASES[b]);
+        }
+
+        // ════════════════════════ OPACITY ════════════════════════
+        function setOpacity(v) {
+            opacity = v / 100;
+            document.getElementById('opa-v').textContent = v + '%';
+            if (map.getLayer('tracts-fill')) map.setPaintProperty('tracts-fill', 'fill-opacity', opacity);
+            [bMap, aMap].forEach(m => { if (m?.getLayer('tracts-fill')) m.setPaintProperty('tracts-fill', 'fill-opacity', opacity); });
+        }
+
+        // ════════════════════════ SPLIT / SWIPE ════════════════════════
+        function teardownSplit() {
+            if (bMap) { try { bMap.remove(); } catch (e) { } }
+            if (aMap) { try { aMap.remove(); } catch (e) { } }
+            cmpObj = null; bMap = null; aMap = null;
+            document.getElementById('cmp').innerHTML = '<div id="before-map"></div><div id="after-map"></div>';
+        }
+        function initSplit() {
+            const c = map.getCenter(), z = map.getZoom(), s = BASES[base];
+            bMap = new mapboxgl.Map({ container: 'before-map', style: s, center: c, zoom: z });
+            aMap = new mapboxgl.Map({ container: 'after-map', style: s, center: c, zoom: z });
+            let bl = false, al = false;
+            function tryInit() {
+                if (!bl || !al) return;
+                if (mode === 'pswipe') {
+                    addSplitLayerByVersion(bMap, TS[pSwipeYear], 'left-pei');
+                    addSplitLayerByVersion(aMap, TS[pSwipeYear], 'right-pei');
+                } else { // yswipe
+                    const lyr = document.getElementById('left-yr').value;
+                    const ryr = document.getElementById('right-yr').value;
+                    const pei = document.getElementById('yswipe-pei').value;
+                    addSplitLayerByYear(bMap, TS[lyr], pei, lyr);
+                    addSplitLayerByYear(aMap, TS[ryr], pei, ryr);
+                }
+                cmpObj = new mapboxgl.Compare(bMap, aMap, '#cmp', {});
+            }
+            bMap.on('load', () => { bl = true; tryInit(); });
+            aMap.on('load', () => { al = true; tryInit(); });
+        }
+        function addSplitLayerByVersion(m, ts, selId) {
+            const col = document.getElementById(selId).value;
+            m.addSource('src', { type: 'vector', url: ts.url });
+            m.addLayer({ id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl, paint: { 'fill-color': peiExpr(col), 'fill-opacity': opacity } });
+            m.addLayer({ id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl, paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] } });
+        }
+        function addSplitLayerByYear(m, ts, peiCol, yr) {
+            m.addSource('src', { type: 'vector', url: ts.url });
+            m.addLayer({ id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl, paint: { 'fill-color': peiExpr(peiCol), 'fill-opacity': opacity } });
+            m.addLayer({ id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl, paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] } });
+            // Year label overlay
+            const el = document.createElement('div');
+            el.style.cssText = 'position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(22,27,39,.85);color:#00d4aa;font-family:Inter,sans-serif;font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;border:1px solid #2a3148;pointer-events:none;z-index:5';
+            el.textContent = yr;
+            document.getElementById('cmp').appendChild(el);
+        }
+        function updateSplit() {
+            if (!bMap || !aMap) return;
+            if (mode === 'pswipe') {
+                const lc = document.getElementById('left-pei').value;
+                const rc = document.getElementById('right-pei').value;
+                if (bMap.getLayer('tracts-fill')) bMap.setPaintProperty('tracts-fill', 'fill-color', peiExpr(lc));
+                if (aMap.getLayer('tracts-fill')) aMap.setPaintProperty('tracts-fill', 'fill-color', peiExpr(rc));
+            } else { teardownSplit(); initSplit(); }
+        }
+
+        // ════════════════════════ STATS ════════════════════════
+        function updateStats() {
+            clearTimeout(statsTimer);
+            statsTimer = setTimeout(() => {
+                if (!map.getLayer('tracts-fill')) return;
+                const feats = map.queryRenderedFeatures({ layers: ['tracts-fill'] });
+                if (!feats.length) return;
+                const col = mode === 'single' ? document.getElementById('pei-sel').value : 'PEI_original';
+                const vals = feats.map(f => +f.properties[col]).filter(v => !isNaN(v));
+                if (!vals.length) return;
+                const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+                document.getElementById('s-n').textContent = feats.length.toLocaleString();
+                document.getElementById('s-mean').textContent = mean.toFixed(3);
+                document.getElementById('s-min').textContent = Math.min(...vals).toFixed(3);
+                document.getElementById('s-max').textContent = Math.max(...vals).toFixed(3);
+            }, 350);
+        }
+
+        // ════════════════════════ LEGEND ════════════════════════
+        function updateLegend() {
+            const bar = document.getElementById('leg-b'), labs = document.getElementById('leg-l'), ttl = document.getElementById('leg-t');
+            if (mode === 'single') {
+                ttl.textContent = PEI_LABELS[document.getElementById('pei-sel').value] || 'PEI Score';
+                bar.style.background = 'linear-gradient(to right,#d73027,#fc8d59,#ffffbf,#91cf60,#1a9850)';
+                labs.innerHTML = '<span>0.0</span><span>0.25</span><span>0.5</span><span>0.75</span><span>1.0</span>';
+            } else if (mode === 'diff') {
+                const d = document.getElementById('diff-sel').value;
+                ttl.textContent = d === 'orig-new' ? 'Orig − New' : 'Orig − Combined';
+                bar.style.background = 'linear-gradient(to right,#1a9850,#91cf60,#ffffbf,#fc8d59,#d73027)';
+                labs.innerHTML = '<span>−0.5</span><span>0</span><span>+0.5</span>';
+            } else {
+                ttl.textContent = mode === 'yswipe' ? 'Year Comparison' : 'PEI Version Compare';
+                bar.style.background = 'linear-gradient(to right,#d73027,#fc8d59,#ffffbf,#91cf60,#1a9850)';
+                labs.innerHTML = '<span>0.0</span><span>0.5</span><span>1.0</span>';
+            }
+        }
+
+        // ════════════════════════ POPUP WITH 3-YEAR TIMELINE ════════════════════════
+        function onTractClick(e) {
+            const geoid = e.features[0].properties.GEOID;
+
+            // Collect data from all 3 background year layers
+            const allLayerIds = ['bg-2013', 'bg-2017', 'bg-2022'].filter(id => map.getLayer(id));
+            const allFeats = map.queryRenderedFeatures(e.point, { layers: allLayerIds });
+            const yearData = {};
+            allFeats.forEach(f => {
+                if (f.properties.GEOID !== geoid) return;
+                const yr = f.layer.id.replace('bg-', '');
+                if (!yearData[yr]) yearData[yr] = f.properties;
+            });
+
+            const p = yearData[year] || e.features[0].properties;
+            const f = v => (v != null && !isNaN(v)) ? (+v).toFixed(3) : '—';
+            const n = v => (v != null) ? (+v).toLocaleString() : '—';
+
+            // PEI bar helper
+            const bar = (label, val) => {
+                const num = +val || 0, col = lerp3('#d73027', '#ffffbf', '#1a9850', num);
+                return `<div class="pbar-row"><div class="pbar-h"><span class="pk">${label}</span><span class="pv">${f(val)}</span></div>
+    <div class="pbar-bg"><div class="pbar-f" style="width:${(num * 100).toFixed(1)}%;background:${col}"></div></div></div>`;
+            };
+
+            // 3-year timeline table
+            const yrs = ['2013', '2017', '2022'];
+            const peis = ['PEI_original', 'PEI_new', 'PEI_combined'];
+            const pShort = { PEI_original: 'Original', PEI_new: 'New', PEI_combined: 'Combined' };
+            let tlRows = '';
+            yrs.forEach(yr => {
+                const d = yearData[yr];
+                const vals = peis.map(pc => {
+                    const v = d ? +d[pc] : null;
+                    const col = d ? lerp3('#d73027', '#ffffbf', '#1a9850', v || 0) : '#666';
+                    return `<td><span style="background:${col};color:#000;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600">${d && v != null ? v.toFixed(2) : '—'}</span></td>`;
+                }).join('');
+                tlRows += `<tr><td class="tl-yr"><b>${yr}</b></td>${vals}</tr>`;
+            });
+
+            const html = `
+  <div class="ph">
+    <div class="pid">GEOID: ${p.GEOID || '—'}</div>
+    <div class="ploc">${p.NAMELSADCO || '—'}, ${p.STATE_NAME || '—'}</div>
+  </div>
+  <div class="pb">
+    <div class="pst">PEI Scores — ${year}</div>
+    ${bar('PEI Original', p.PEI_original)}
+    ${bar('PEI New', p.PEI_new)}
+    ${bar('PEI Combined', p.PEI_combined)}
+    <div class="pst" style="margin-top:10px">📅 3-Year Timeline</div>
+    <table class="tl-table">
+      <thead><tr><th></th><th>Original</th><th>New</th><th>Combined</th></tr></thead>
+      <tbody>${tlRows}</tbody>
+    </table>
+    <div class="pst">Indices (${year}, Normalized)</div>
+    <div class="pgr">
+      <div class="pr"><span class="pk">CDI</span><span class="pv">${f(p.CDI)}</span></div>
+      <div class="pr"><span class="pk">IDI</span><span class="pv">${f(p.IDI)}</span></div>
+      <div class="pr"><span class="pk">LDI</span><span class="pv">${f(p.LDI)}</span></div>
+      <div class="pr"><span class="pk">PDI</span><span class="pv">${f(p.PDI)}</span></div>
+      <div class="pr"><span class="pk">RSI</span><span class="pv">${f(p.RSI)}</span></div>
+      <div class="pr"><span class="pk">GSI</span><span class="pv">${f(p.GSI)}</span></div>
+      <div class="pr"><span class="pk">BI</span><span class="pv">${f(p.BI)}</span></div>
+      <div class="pr"><span class="pk">PTAL</span><span class="pv">${f(p.PTAL)}</span></div>
+    </div>
+    <div class="pst">Demographics</div>
+    <div class="pgr">
+      <div class="pr"><span class="pk">Population</span><span class="pv">${n(p['Population Count'])}</span></div>
+      <div class="pr"><span class="pk">Commercial</span><span class="pv">${n(p['Commercial Count'])}</span></div>
+      <div class="pr"><span class="pk">Intersections</span><span class="pv">${n(p['Intersection Count'])}</span></div>
+      <div class="pr"><span class="pk">Area (km²)</span><span class="pv">${p['Polygon Area'] ? (+p['Polygon Area']).toFixed(1) : '—'}</span></div>
+    </div>
+  </div>`;
+            popup.setLngLat(e.lngLat).setHTML(html).addTo(map);
+        }
+
+        function lerp3(c0, cMid, c1, t) {
+            let a, b, tt;
+            if (t <= 0.5) { a = c0; b = cMid; tt = t * 2; } else { a = cMid; b = c1; tt = (t - 0.5) * 2; }
+            const h = s => parseInt(s.slice(1), 16), ah = h(a), bh = h(b);
+            const r = Math.round(((ah >> 16) & 255) + (((bh >> 16) & 255) - ((ah >> 16) & 255)) * tt);
+            const g = Math.round(((ah >> 8) & 255) + (((bh >> 8) & 255) - ((ah >> 8) & 255)) * tt);
+            const bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * tt);
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bl.toString(16).padStart(2, '0')}`;
+        }
+        Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity });
+    </script>
+</body>
+
+</html>
