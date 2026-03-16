@@ -626,17 +626,9 @@
         </div>
     </div>
 
-    <script type="module">
+    <script>
         // ════════════════════════ CONFIG ════════════════════════
-        const token = import.meta.env.VITE_MAPBOX_TOKEN || '';
-        if (!token) {
-            const loader = document.getElementById('ld');
-            if (loader) {
-                loader.innerHTML = '<p style="padding:16px;max-width:360px;text-align:center;color:#fca5a5">Missing VITE_MAPBOX_TOKEN. Add it in your .env file.</p>';
-            }
-            throw new Error('Missing VITE_MAPBOX_TOKEN');
-        }
-        mapboxgl.accessToken = token;
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWRld2l0dDMzIiwiYSI6ImNtbXRwenI1YTAweXAyd29jdzZhcXJnYzYifQ.3h1nAPMwzDpUaH3Tsbkozw';
 
         const TS = {
             '2013': { url: 'mapbox://mdewitt33.8hxsrcd4', id: 'mdewitt33.8hxsrcd4', sl: null },
@@ -709,16 +701,17 @@
             map.on('idle', updateStats);
             map.on('click', 'tracts-fill', onTractClick);
             
-            // Hover highlight logic
-            map.on('mousemove', 'tracts-fill', (e) => {
-                if (e.features.length > 0) {
-                    map.setFilter('tracts-hover', ['==', 'GEOID', e.features[0].properties.GEOID]);
-                    map.getCanvas().style.cursor = 'pointer';
-                }
-            });
-            map.on('mouseleave', 'tracts-fill', () => {
-                map.setFilter('tracts-hover', ['==', 'GEOID', '']);
-                map.getCanvas().style.cursor = '';
+            // Cursor hint logic
+            map.on('mouseenter', 'tracts-fill', () => map.getCanvas().style.cursor = 'pointer');
+            map.on('mouseleave', 'tracts-fill', () => map.getCanvas().style.cursor = '');
+
+            // Clear highlight when popup is genuinely closed (using a small timeout to avoid race conditions when switching tracts)
+            popup.on('close', () => {
+                setTimeout(() => {
+                    if (!popup.isOpen() && map.getLayer('tracts-hover')) {
+                        map.setFilter('tracts-hover', ['==', 'GEOID', '']);
+                    }
+                }, 50);
             });
 
             updateLayer(); updateLegend();
@@ -917,6 +910,11 @@
         function onTractClick(e) {
             const geoid = e.features[0].properties.GEOID;
 
+            // Highlight the clicked tract
+            if (map.getLayer('tracts-hover')) {
+                map.setFilter('tracts-hover', ['==', 'GEOID', geoid]);
+            }
+
             // Collect data from all 3 background year layers
             const allLayerIds = ['bg-2013', 'bg-2017', 'bg-2022'].filter(id => map.getLayer(id));
             const allFeats = map.queryRenderedFeatures(e.point, { layers: allLayerIds });
@@ -999,7 +997,6 @@
             const bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * tt);
             return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bl.toString(16).padStart(2, '0')}`;
         }
-        Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity });
     </script>
 </body>
 
