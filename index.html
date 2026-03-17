@@ -1170,8 +1170,8 @@
             function tryInit() {
                 if (!bl || !al) return;
                 if (mode === 'pswipe') {
-                    addSplitLayerByVersion(bMap, TS[pSwipeYear], 'left-pei');
-                    addSplitLayerByVersion(aMap, TS[pSwipeYear], 'right-pei');
+                    addSplitLayerByVersion(bMap, TS[pSwipeYear], 'left-pei', 'before-map');
+                    addSplitLayerByVersion(aMap, TS[pSwipeYear], 'right-pei', 'after-map');
                 } else { // yswipe
                     const lyr = document.getElementById('left-yr').value;
                     const ryr = document.getElementById('right-yr').value;
@@ -1184,20 +1184,24 @@
             bMap.on('load', () => { bl = true; tryInit(); });
             aMap.on('load', () => { al = true; tryInit(); });
         }
-        function addSplitLayerByVersion(m, ts, selId) {
+        function addSplitLabel(containerId, text) {
+            const el = document.createElement('div');
+            el.className = 'cmp-year-label';
+            el.textContent = text;
+            document.getElementById(containerId).appendChild(el);
+        }
+        function addSplitLayerByVersion(m, ts, selId, containerId) {
             const col = document.getElementById(selId).value;
             m.addSource('src', { type: 'vector', url: ts.url });
             m.addLayer({ id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl, paint: { 'fill-color': peiExpr(col), 'fill-opacity': opacity } });
             m.addLayer({ id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl, paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] } });
+            addSplitLabel(containerId, PEI_LABELS[col] || col);
         }
         function addSplitLayerByYear(m, ts, peiCol, yr, containerId) {
             m.addSource('src', { type: 'vector', url: ts.url });
             m.addLayer({ id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl, paint: { 'fill-color': peiExpr(peiCol), 'fill-opacity': opacity } });
             m.addLayer({ id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl, paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] } });
-            const el = document.createElement('div');
-            el.className = 'cmp-year-label';
-            el.textContent = yr;
-            document.getElementById(containerId).appendChild(el);
+            addSplitLabel(containerId, yr);
         }
         function updateSplit() {
             if (!bMap || !aMap) return;
@@ -1206,6 +1210,10 @@
                 const rc = document.getElementById('right-pei').value;
                 if (bMap.getLayer('tracts-fill')) bMap.setPaintProperty('tracts-fill', 'fill-color', peiExpr(lc));
                 if (aMap.getLayer('tracts-fill')) aMap.setPaintProperty('tracts-fill', 'fill-color', peiExpr(rc));
+                const leftLabel = document.querySelector('#before-map .cmp-year-label');
+                const rightLabel = document.querySelector('#after-map .cmp-year-label');
+                if (leftLabel) leftLabel.textContent = PEI_LABELS[lc] || lc;
+                if (rightLabel) rightLabel.textContent = PEI_LABELS[rc] || rc;
             } else { teardownSplit(); initSplit(); }
         }
 
