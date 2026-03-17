@@ -255,7 +255,7 @@ function addLayers(m, yr) {
     });
     m.addLayer({
         id: 'tracts-hover', type: 'line', source: 'src', 'source-layer': ts.sl,
-        paint: { 'line-color': '#00d4aa', 'line-width': 2, 'line-opacity': 1 },
+        paint: { 'line-color': '#000', 'line-width': 2, 'line-opacity': 1 },
         filter: ['==', 'GEOID', '']
     });
 }
