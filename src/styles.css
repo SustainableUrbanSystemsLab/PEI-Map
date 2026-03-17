@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    color-scheme: dark light;
+    color-scheme: dark;
     --sb: 275px;
     --bg: #0d1117;
     --panel: #161b27;
@@ -20,8 +20,28 @@
     --geocoder-active: rgba(0, 212, 170, .14)
 }
 
+:root[data-theme='light'] {
+    color-scheme: light;
+    --bg: #eef3f8;
+    --panel: #ffffff;
+    --card: #f7fafd;
+    --bdr: #ccd7e3;
+    --acc: #0b8f7d;
+    --txt: #172533;
+    --mut: #5f7082;
+    --panel-grad-start: #ffffff;
+    --panel-grad-end: #edf3f8;
+    --control-bg: rgba(255, 255, 255, .96);
+    --floating-bg: rgba(255, 255, 255, .94);
+    --chip-bg: rgba(255, 255, 255, .9);
+    --geocoder-bg: rgba(255, 255, 255, .97);
+    --geocoder-hover: rgba(23, 37, 51, .05);
+    --geocoder-active: rgba(11, 143, 125, .12)
+}
+
 @media (prefers-color-scheme: light) {
-    :root {
+    :root:not([data-theme='light']):not([data-theme='dark']) {
+        color-scheme: light;
         --bg: #eef3f8;
         --panel: #ffffff;
         --card: #f7fafd;

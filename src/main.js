@@ -52,15 +52,18 @@ let year = '2013', mode = 'single', base = colorSchemeMq.matches ? 'dark' : 'lig
 let cmpObj = null, bMap = null, aMap = null, pSwipeYear = '2013';
 let statsTimer = null;
 let autoThemeBase = true;
+let themeMode = 'auto';
 const popup = new mapboxgl.Popup({ closeButton: true, closeOnClick: false, maxWidth: '320px' });
 const mobileMq = window.matchMedia('(max-width: 980px)');
 const bodyEl = document.body;
+const rootEl = document.documentElement;
 const sidebarEl = document.getElementById('sb');
 const sidebarToggleBtn = document.getElementById('sb-toggle');
 const sidebarCloseBtn = document.getElementById('sb-close');
 const sidebarBackdrop = document.getElementById('sb-backdrop');
 const resetViewBtn = document.getElementById('reset-view');
 const statsNoteEl = document.getElementById('stats-note');
+const THEME_STORAGE_KEY = 'pei-theme-mode';
 
 function showLoaderMessage(message) {
     const loader = document.getElementById('ld');
@@ -136,7 +139,33 @@ function syncBaseButtons() {
     });
 }
 
+function syncThemeButtons() {
+    ['auto', 'light', 'dark'].forEach((x) => {
+        document.getElementById('theme-' + x)?.classList.toggle('on', x === themeMode);
+    });
+}
+
+function setThemeMode(mode) {
+    themeMode = ['auto', 'light', 'dark'].includes(mode) ? mode : 'auto';
+    if (themeMode === 'auto') rootEl.removeAttribute('data-theme');
+    else rootEl.setAttribute('data-theme', themeMode);
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, themeMode);
+    } catch (error) {
+        console.warn('Unable to save theme preference.', error);
+    }
+    syncThemeButtons();
+}
+
+try {
+    const storedThemeMode = localStorage.getItem(THEME_STORAGE_KEY);
+    if (storedThemeMode) themeMode = storedThemeMode;
+} catch (error) {
+    console.warn('Unable to read theme preference.', error);
+}
+
 syncBaseButtons();
+setThemeMode(themeMode);
 
 function setSidebarOpen(open) {
     bodyEl.classList.toggle('sb-open', !!open);
@@ -198,6 +227,7 @@ map.addControl(
 map.addControl(new mapboxgl.ScaleControl({ maxWidth: 200, unit: 'imperial' }), 'bottom-left');
 map.on('click', closeSidebarIfMobile);
 colorSchemeMq.addEventListener('change', () => {
+    if (themeMode === 'auto') setThemeMode('auto');
     if (autoThemeBase && (base === 'light' || base === 'dark')) {
         setBase(getSystemBase(), true);
     }
@@ -539,7 +569,7 @@ function lerp3(c0, cMid, c1, t) {
     const bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * tt);
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bl.toString(16).padStart(2, '0')}`;
 }
-Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity });
+Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity, setThemeMode });
     
 
 

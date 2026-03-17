@@ -5,6 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PEI National Dashboard</title>
+    <script>
+        (() => {
+            try {
+                const themeMode = localStorage.getItem('pei-theme-mode');
+                if (themeMode === 'light' || themeMode === 'dark') {
+                    document.documentElement.setAttribute('data-theme', themeMode);
+                }
+            } catch (error) {
+                console.warn('Unable to restore theme preference.', error);
+            }
+        })();
+    </script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
@@ -157,6 +169,15 @@
             </select>
             <p class="hint" style="margin-top:6px">Drag the divider to compare years side by side at the same location.
             </p>
+        </div>
+
+        <div class="sec">
+            <div class="lbl">UI Theme</div>
+            <div class="br">
+                <button class="btn" id="theme-auto" onclick="setThemeMode('auto')">Auto</button>
+                <button class="btn" id="theme-light" onclick="setThemeMode('light')">Light</button>
+                <button class="btn" id="theme-dark" onclick="setThemeMode('dark')">Dark</button>
+            </div>
         </div>
 
         <!-- BASEMAP -->
