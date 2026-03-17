@@ -1,0 +1,3 @@
+## 2024-05-18 - Avoid spread operator for Mapbox aggregation
+**Learning:** Mapbox can return hundreds of thousands of geometries easily from a layer. When aggregating features using Javascript array methods, specifically `Math.min(...vals)` and `Math.max(...vals)`, the amount of array items spread over arguments will blow up the V8 Javascript engine call stack size, crashing the client. In addition, iterating arrays using `.map()` followed by `.filter()` creates intermediate arrays, causing memory bloat and garbage collector pauses.
+**Action:** Use single-pass `for` loops without spread arguments (`...vals`) to compute aggregates (count, sum, min, max) without hitting maximum call stack size exceeded or wasting memory.

@@ -536,17 +536,34 @@ function updateStats() {
             return;
         }
         const col = mode === 'single' ? document.getElementById('pei-sel').value : 'PEI_original';
-        const vals = feats.map(f => +f.properties[col]).filter(v => !isNaN(v));
-        if (!vals.length) {
+        let count = 0;
+        let sum = 0;
+        let min = Infinity;
+        let max = -Infinity;
+
+        // ⚡ Bolt: Single pass O(n) loop to calculate stats without intermediate arrays
+        // Avoids "Maximum call stack size exceeded" on Math.min(...vals) with large feature counts
+        for (let i = 0; i < feats.length; i++) {
+            const val = +feats[i].properties[col];
+            if (!isNaN(val)) {
+                count++;
+                sum += val;
+                if (val < min) min = val;
+                if (val > max) max = val;
+            }
+        }
+
+        if (count === 0) {
             resetStats('No PEI values available');
             return;
         }
-        const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+
+        const mean = sum / count;
         statsNoteEl.textContent = 'Current viewport';
         document.getElementById('s-n').textContent = feats.length.toLocaleString();
         document.getElementById('s-mean').textContent = mean.toFixed(3);
-        document.getElementById('s-min').textContent = Math.min(...vals).toFixed(3);
-        document.getElementById('s-max').textContent = Math.max(...vals).toFixed(3);
+        document.getElementById('s-min').textContent = min.toFixed(3);
+        document.getElementById('s-max').textContent = max.toFixed(3);
     }, 350);
 }
 
