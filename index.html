@@ -626,9 +626,17 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
         // ════════════════════════ CONFIG ════════════════════════
-        mapboxgl.accessToken = 'pk.eyJ1IjoibWRld2l0dDMzIiwiYSI6ImNtbXRwenI1YTAweXAyd29jdzZhcXJnYzYifQ.3h1nAPMwzDpUaH3Tsbkozw';
+        const token = import.meta.env.VITE_MAPBOX_TOKEN || '';
+        if (!token) {
+            const loader = document.getElementById('ld');
+            if (loader) {
+                loader.innerHTML = '<p style="padding:16px;max-width:360px;text-align:center;color:#fca5a5">Missing VITE_MAPBOX_TOKEN. Add it in your .env file.</p>';
+            }
+            throw new Error('Missing VITE_MAPBOX_TOKEN');
+        }
+        mapboxgl.accessToken = token;
 
         const TS = {
             '2013': { url: 'mapbox://mdewitt33.8hxsrcd4', id: 'mdewitt33.8hxsrcd4', sl: null },
@@ -997,6 +1005,7 @@
             const bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * tt);
             return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bl.toString(16).padStart(2, '0')}`;
         }
+        Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity });
     </script>
 </body>
 
