@@ -1,0 +1,102 @@
+name: Publish GitHub Release
+
+on:
+  workflow_run:
+    workflows: ['Deploy to GitHub Pages']
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.event == 'push'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --force --tags origin
+
+      - name: Prepare release metadata
+        id: meta
+        shell: bash
+        env:
+          HEAD_SHA: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          SITE_URL: https://sustainableurbansystems.com/PEI-Map/
+        run: |
+          set -euo pipefail
+
+          SHORT_SHA="${HEAD_SHA::7}"
+          TAG="deploy-${SHORT_SHA}"
+          TITLE="${REPO_NAME} deploy ${SHORT_SHA}"
+          PREVIOUS_TAG="$(git tag --sort=-creatordate | grep '^deploy-' | grep -v "^${TAG}$" | head -n 1 || true)"
+
+          {
+            echo "tag=${TAG}"
+            echo "title=${TITLE}"
+            echo "head_sha=${HEAD_SHA}"
+            echo "previous_tag=${PREVIOUS_TAG}"
+          } >> "$GITHUB_OUTPUT"
+
+          NOTES_FILE="$(mktemp)"
+          {
+            echo "Automated release for GitHub Pages deployment."
+            echo
+            echo "- Site: ${SITE_URL}"
+            echo "- Commit: [\`${SHORT_SHA}\`](${REPO_URL}/commit/${HEAD_SHA})"
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              echo "- Compare: [${PREVIOUS_TAG}...${SHORT_SHA}](${REPO_URL}/compare/${PREVIOUS_TAG}...${HEAD_SHA})"
+            fi
+            echo
+            echo "## Commit Summary"
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              git log "${PREVIOUS_TAG}..${HEAD_SHA}" --no-merges --pretty=format:'- %s (`%h`)'
+            else
+              echo "- First automated release."
+            fi
+          } > "${NOTES_FILE}"
+
+          {
+            echo "notes_file=${NOTES_FILE}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check for existing release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${{ steps.meta.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.meta.outputs.tag }}" \
+            --target "${{ steps.meta.outputs.head_sha }}" \
+            --title "${{ steps.meta.outputs.title }}" \
+            --notes-file "${{ steps.meta.outputs.notes_file }}" \
+            --generate-notes \
+            --latest
+
+      - name: Show release status
+        if: steps.check.outputs.exists == 'true'
+        run: echo "Release ${{ steps.meta.outputs.tag }} already exists. Skipping."
