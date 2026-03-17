@@ -344,13 +344,8 @@
             z-index: 5
         }
 
-        .cmp-year-label.left {
-            left: 25%;
-            transform: translateX(-50%)
-        }
-
-        .cmp-year-label.right {
-            left: 75%;
+        .cmp-year-label {
+            left: 50%;
             transform: translateX(-50%)
         }
 
@@ -1181,8 +1176,8 @@
                     const lyr = document.getElementById('left-yr').value;
                     const ryr = document.getElementById('right-yr').value;
                     const pei = document.getElementById('yswipe-pei').value;
-                    addSplitLayerByYear(bMap, TS[lyr], pei, lyr, 'left');
-                    addSplitLayerByYear(aMap, TS[ryr], pei, ryr, 'right');
+                    addSplitLayerByYear(bMap, TS[lyr], pei, lyr, 'before-map');
+                    addSplitLayerByYear(aMap, TS[ryr], pei, ryr, 'after-map');
                 }
                 cmpObj = new mapboxgl.Compare(bMap, aMap, '#cmp', {});
             }
@@ -1195,14 +1190,14 @@
             m.addLayer({ id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl, paint: { 'fill-color': peiExpr(col), 'fill-opacity': opacity } });
             m.addLayer({ id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl, paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] } });
         }
-        function addSplitLayerByYear(m, ts, peiCol, yr, side) {
+        function addSplitLayerByYear(m, ts, peiCol, yr, containerId) {
             m.addSource('src', { type: 'vector', url: ts.url });
             m.addLayer({ id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl, paint: { 'fill-color': peiExpr(peiCol), 'fill-opacity': opacity } });
             m.addLayer({ id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl, paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] } });
             const el = document.createElement('div');
-            el.className = `cmp-year-label ${side}`;
+            el.className = 'cmp-year-label';
             el.textContent = yr;
-            document.getElementById('cmp').appendChild(el);
+            document.getElementById(containerId).appendChild(el);
         }
         function updateSplit() {
             if (!bMap || !aMap) return;
