@@ -111,6 +111,21 @@ function getCountyName(props) {
     return null;
 }
 
+function getNumericProp(props, keys) {
+    const value = getPropValue(props, keys);
+    if (value == null) return null;
+    const num = Number(String(value).replace(/,/g, ''));
+    return Number.isFinite(num) ? num : null;
+}
+
+function getAreaKm2(props) {
+    const areaKm2 = getNumericProp(props, ['Polygon Area', 'POLYGON_AREA', 'POLYGONAREA', 'AREA_KM2', 'AREAKM2', 'SQKM']);
+    if (areaKm2 != null) return areaKm2;
+    const areaM2 = getNumericProp(props, ['ALAND', 'AREA_M2', 'AREAM2', 'SHAPE_AREA', 'Shape_Area']);
+    if (areaM2 != null) return areaM2 / 1000000;
+    return null;
+}
+
 function getSystemBase() {
     return colorSchemeMq.matches ? 'dark' : 'light';
 }
@@ -474,6 +489,10 @@ function onTractClick(e) {
 
     const countyName = getCountyName(p) || '-';
     const stateName = getStateName(p) || '-';
+    const population = getNumericProp(p, ['Population Count', 'POPULATION_COUNT', 'POPULATIONCOUNT', 'POPULATION', 'TOTPOP', 'POP']);
+    const commercial = getNumericProp(p, ['Commercial Count', 'COMMERCIAL_COUNT', 'COMMERCIALCOUNT', 'COMMERCIAL', 'COMM_COUNT']);
+    const intersections = getNumericProp(p, ['Intersection Count', 'INTERSECTION_COUNT', 'INTERSECTIONCOUNT', 'INTERSECTIONS']);
+    const areaKm2 = getAreaKm2(p);
     const html = `
   <div class="ph">
     <div class="pid">GEOID: ${p.GEOID || '—'}</div>
@@ -502,10 +521,10 @@ function onTractClick(e) {
     </div>
     <div class="pst">Demographics</div>
     <div class="pgr">
-      <div class="pr"><span class="pk">Population</span><span class="pv">${n(p['Population Count'])}</span></div>
-      <div class="pr"><span class="pk">Commercial</span><span class="pv">${n(p['Commercial Count'])}</span></div>
-      <div class="pr"><span class="pk">Intersections</span><span class="pv">${n(p['Intersection Count'])}</span></div>
-      <div class="pr"><span class="pk">Area (km²)</span><span class="pv">${p['Polygon Area'] ? (+p['Polygon Area']).toFixed(1) : '—'}</span></div>
+      <div class="pr"><span class="pk">Population</span><span class="pv">${n(population)}</span></div>
+      <div class="pr"><span class="pk">Commercial</span><span class="pv">${n(commercial)}</span></div>
+      <div class="pr"><span class="pk">Intersections</span><span class="pv">${n(intersections)}</span></div>
+      <div class="pr"><span class="pk">Area (km2)</span><span class="pv">${areaKm2 != null ? areaKm2.toFixed(1) : '-'}</span></div>
     </div>
   </div>`;
     popup.setLngLat(e.lngLat).setHTML(html).addTo(map);
