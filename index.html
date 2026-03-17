@@ -57,7 +57,8 @@
         .sbh {
             padding: 16px 14px 12px;
             border-bottom: 1px solid var(--bdr);
-            background: linear-gradient(135deg, #161b27, #1e2535)
+            background: linear-gradient(135deg, #161b27, #1e2535);
+            position: relative
         }
 
         .sbh h1 {
@@ -179,6 +180,39 @@
             color: var(--mut);
             min-width: 28px;
             text-align: right
+        }
+
+        #sb-toggle,
+        #sb-close {
+            border: 1px solid var(--bdr);
+            background: rgba(30, 37, 53, .95);
+            color: var(--txt);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer
+        }
+
+        #sb-toggle {
+            display: none;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 12;
+            padding: 8px 10px
+        }
+
+        #sb-close {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 9px
+        }
+
+        #sb-backdrop {
+            display: none
         }
 
         #mw {
@@ -434,12 +468,96 @@
             color: var(--mut);
             font-size: 12px
         }
+
+        @media (max-width: 980px) {
+            #sb {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: min(82vw, 360px);
+                min-width: min(82vw, 360px);
+                max-width: 360px;
+                transform: translateX(-105%);
+                transition: transform .22s ease;
+                box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
+                z-index: 30
+            }
+
+            body.sb-open #sb {
+                transform: translateX(0)
+            }
+
+            #sb-toggle,
+            #sb-close {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center
+            }
+
+            #sb-backdrop {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, .45);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .2s ease;
+                z-index: 20
+            }
+
+            body.sb-open #sb-backdrop {
+                opacity: 1;
+                pointer-events: auto
+            }
+
+            #stats {
+                top: 58px;
+                right: 10px;
+                min-width: 140px
+            }
+
+            #legend {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                min-width: 0
+            }
+
+            .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+                margin-top: 10px;
+                margin-left: 10px
+            }
+
+            .mapboxgl-ctrl-geocoder {
+                min-width: 0 !important;
+                width: min(62vw, 310px) !important;
+                max-width: min(62vw, 310px) !important
+            }
+        }
+
+        @media (max-width: 640px) {
+            #stats {
+                max-width: 145px;
+                min-width: 0
+            }
+
+            .fp {
+                padding: 9px 10px
+            }
+
+            .mapboxgl-ctrl-geocoder {
+                width: min(58vw, 240px) !important;
+                max-width: min(58vw, 240px) !important
+            }
+        }
     </style>
 </head>
 
 <body>
     <div id="sb">
         <div class="sbh">
+            <button id="sb-close" type="button" aria-label="Close controls">Close</button>
             <h1>🗺&nbsp; PEI Dashboard</h1>
             <p>Pedestrian Environment Index · Nationwide</p>
         </div>
@@ -601,9 +719,11 @@
             </div>
         </div>
     </div>
+    <div id="sb-backdrop" aria-hidden="true"></div>
 
     <!-- MAP -->
     <div id="mw">
+        <button id="sb-toggle" type="button" aria-label="Open controls">Controls</button>
         <div id="ld">
             <div class="spin"></div>
             <p>Loading PEI tileset data…</p>
@@ -665,6 +785,34 @@
         let cmpObj = null, bMap = null, aMap = null, pSwipeYear = '2013';
         let statsTimer = null;
         const popup = new mapboxgl.Popup({ closeButton: true, closeOnClick: false, maxWidth: '320px' });
+        const mobileMq = window.matchMedia('(max-width: 980px)');
+        const bodyEl = document.body;
+        const sidebarEl = document.getElementById('sb');
+        const sidebarToggleBtn = document.getElementById('sb-toggle');
+        const sidebarCloseBtn = document.getElementById('sb-close');
+        const sidebarBackdrop = document.getElementById('sb-backdrop');
+
+        function setSidebarOpen(open) {
+            bodyEl.classList.toggle('sb-open', !!open);
+        }
+
+        function closeSidebarIfMobile() {
+            if (mobileMq.matches) setSidebarOpen(false);
+        }
+
+        sidebarToggleBtn?.addEventListener('click', () => setSidebarOpen(!bodyEl.classList.contains('sb-open')));
+        sidebarCloseBtn?.addEventListener('click', () => setSidebarOpen(false));
+        sidebarBackdrop?.addEventListener('click', () => setSidebarOpen(false));
+        sidebarEl?.addEventListener('click', (e) => {
+            const target = e.target;
+            if (mobileMq.matches && target instanceof Element && target.closest('button.btn')) setSidebarOpen(false);
+        });
+        sidebarEl?.addEventListener('change', (e) => {
+            const target = e.target;
+            if (mobileMq.matches && target instanceof Element && target.tagName === 'SELECT') setSidebarOpen(false);
+        });
+        window.addEventListener('resize', () => { if (!mobileMq.matches) setSidebarOpen(false); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setSidebarOpen(false); });
 
         // ════════════════════════ SOURCE LAYER DETECTION ════════════════════════
         async function detectSourceLayers() {
@@ -696,6 +844,7 @@
 
         // Add Scale Control
         map.addControl(new mapboxgl.ScaleControl({ maxWidth: 200, unit: 'imperial' }), 'bottom-left');
+        map.on('click', closeSidebarIfMobile);
 
         map.on('load', async () => {
             await detectSourceLayers();
