@@ -1,0 +1,456 @@
+import './styles.css';
+
+// ════════════════════════ CONFIG ════════════════════════
+const token = import.meta.env.VITE_MAPBOX_TOKEN || '';
+if (!token) {
+    const loader = document.getElementById('ld');
+    if (loader) {
+        loader.innerHTML = '<p style="padding:16px;max-width:360px;text-align:center;color:#fca5a5">Missing VITE_MAPBOX_TOKEN. Add it in your .env file.</p>';
+    }
+    throw new Error('Missing VITE_MAPBOX_TOKEN');
+}
+mapboxgl.accessToken = token;
+
+const DEFAULT_VIEW = { center: [-98.35, 39.5], zoom: 3.8 };
+const TS = {
+    '2013': { url: 'mapbox://mdewitt33.8hxsrcd4', id: 'mdewitt33.8hxsrcd4', sl: null },
+    '2017': { url: 'mapbox://mdewitt33.bg9qdffy', id: 'mdewitt33.bg9qdffy', sl: null },
+    '2022': { url: 'mapbox://mdewitt33.4yj7jlgm', id: 'mdewitt33.4yj7jlgm', sl: null },
+};
+
+const BASES = {
+    light: 'mapbox://styles/mapbox/light-v11',
+    dark: 'mapbox://styles/mapbox/dark-v11',
+    satellite: 'mapbox://styles/mapbox/satellite-streets-v12',
+    streets: 'mapbox://styles/mapbox/streets-v12',
+};
+
+const PEI_GRAD = [0, '#d73027', 0.25, '#fc8d59', 0.5, '#ffffbf', 0.75, '#91cf60', 1, '#1a9850'];
+const DIFF_GRAD = [-0.5, '#1a9850', -0.1, '#91cf60', 0, '#ffffbf', 0.1, '#fc8d59', 0.5, '#d73027'];
+const PEI_LABELS = {
+    PEI_original: 'PEI Original', PEI_new: 'PEI New', PEI_combined: 'PEI Combined',
+    CDI: 'Commercial Density', IDI: 'Intersection Density', LDI: 'Land Use Diversity', PDI: 'Population Density',
+    RSI: 'Road Safety Index', GSI: 'Green Space Index', BI: 'Bike Infrastructure', PTAL: 'Public Transit Access'
+};
+
+// ════════════════════════ STATE ════════════════════════
+let year = '2013', mode = 'single', base = 'light', opacity = 0.8;
+let cmpObj = null, bMap = null, aMap = null, pSwipeYear = '2013';
+let statsTimer = null;
+const popup = new mapboxgl.Popup({ closeButton: true, closeOnClick: false, maxWidth: '320px' });
+const mobileMq = window.matchMedia('(max-width: 980px)');
+const bodyEl = document.body;
+const sidebarEl = document.getElementById('sb');
+const sidebarToggleBtn = document.getElementById('sb-toggle');
+const sidebarCloseBtn = document.getElementById('sb-close');
+const sidebarBackdrop = document.getElementById('sb-backdrop');
+const resetViewBtn = document.getElementById('reset-view');
+const statsNoteEl = document.getElementById('stats-note');
+
+function showLoaderMessage(message) {
+    const loader = document.getElementById('ld');
+    if (!loader) return;
+    loader.innerHTML = `<p style="padding:16px;max-width:360px;text-align:center;color:#fca5a5">${message}</p>`;
+    loader.classList.remove('gone');
+}
+
+function resetStats(message = 'Current viewport') {
+    statsNoteEl.textContent = message;
+    document.getElementById('s-n').textContent = '-';
+    document.getElementById('s-mean').textContent = '-';
+    document.getElementById('s-min').textContent = '-';
+    document.getElementById('s-max').textContent = '-';
+}
+
+function setSidebarOpen(open) {
+    bodyEl.classList.toggle('sb-open', !!open);
+}
+
+function closeSidebarIfMobile() {
+    if (mobileMq.matches) setSidebarOpen(false);
+}
+
+sidebarToggleBtn?.addEventListener('click', () => setSidebarOpen(!bodyEl.classList.contains('sb-open')));
+sidebarCloseBtn?.addEventListener('click', () => setSidebarOpen(false));
+sidebarBackdrop?.addEventListener('click', () => setSidebarOpen(false));
+sidebarEl?.addEventListener('click', (e) => {
+    const target = e.target;
+    if (mobileMq.matches && target instanceof Element && target.closest('button.btn')) setSidebarOpen(false);
+});
+sidebarEl?.addEventListener('change', (e) => {
+    const target = e.target;
+    if (mobileMq.matches && target instanceof Element && target.tagName === 'SELECT') setSidebarOpen(false);
+});
+window.addEventListener('resize', () => { if (!mobileMq.matches) setSidebarOpen(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setSidebarOpen(false); });
+resetViewBtn?.addEventListener('click', () => {
+    map.easeTo({ center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, duration: 900 });
+    popup.remove();
+    if (map.getLayer('tracts-hover')) map.setFilter('tracts-hover', ['==', 'GEOID', '']);
+});
+
+// ════════════════════════ SOURCE LAYER DETECTION ════════════════════════
+async function detectSourceLayers() {
+    for (const [yr, ts] of Object.entries(TS)) {
+        try {
+            const r = await fetch(`https://api.mapbox.com/v4/${ts.id}.json?access_token=${mapboxgl.accessToken}`);
+            if (!r.ok) throw new Error(`Metadata request failed (${r.status})`);
+            const meta = await r.json();
+            const layers = meta.vector_layers || [];
+            if (layers.length > 0) { ts.sl = layers[0].id; console.log(`✅ ${yr} → "${ts.sl}"`); }
+            else console.warn(`❌ ${yr}: no vector_layers`, meta);
+        } catch (e) { console.error(`❌ ${yr}:`, e); }
+    }
+}
+
+// ════════════════════════ MAIN MAP ════════════════════════
+const map = new mapboxgl.Map({ container: 'map', style: BASES.light, center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, minZoom: 2 });
+map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+// Add Geocoder
+map.addControl(
+    new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+        marker: false,
+        placeholder: 'Search address or place...'
+    }),
+    'top-left'
+);
+
+// Add Scale Control
+map.addControl(new mapboxgl.ScaleControl({ maxWidth: 200, unit: 'imperial' }), 'bottom-left');
+map.on('click', closeSidebarIfMobile);
+
+map.on('load', async () => {
+    await detectSourceLayers();
+    if (Object.values(TS).some(ts => !ts.sl)) {
+        console.error('Source layer detection failed');
+        showLoaderMessage('Unable to load one or more PEI layers. Check the Mapbox token and tileset access.');
+        return;
+    }
+
+    // Add active year layer
+    addLayers(map, year);
+
+    // Add background (opacity-0) layers for all years — needed for cross-year popup timeline
+    addBackgroundLayers(map);
+
+    map.on('idle', updateStats);
+    map.on('click', 'tracts-fill', onTractClick);
+    
+    // Cursor hint logic
+    map.on('mouseenter', 'tracts-fill', () => map.getCanvas().style.cursor = 'pointer');
+    map.on('mouseleave', 'tracts-fill', () => map.getCanvas().style.cursor = '');
+
+    // Clear highlight when popup is genuinely closed (using a small timeout to avoid race conditions when switching tracts)
+    popup.on('close', () => {
+        setTimeout(() => {
+            if (!popup.isOpen() && map.getLayer('tracts-hover')) {
+                map.setFilter('tracts-hover', ['==', 'GEOID', '']);
+            }
+        }, 50);
+    });
+
+    updateLayer(); updateLegend();
+    document.getElementById('ld').classList.add('gone');
+    resetStats();
+});
+
+// ════════════════════════ LAYER MANAGEMENT ════════════════════════
+function addLayers(m, yr) {
+    const ts = TS[yr];
+    if (!ts.sl) return;
+    ['tracts-fill', 'tracts-line', 'tracts-hover'].forEach(id => { if (m.getLayer(id)) m.removeLayer(id); });
+    if (m.getSource('src')) m.removeSource('src');
+    m.addSource('src', { type: 'vector', url: ts.url });
+    m.addLayer({
+        id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl,
+        paint: { 'fill-color': peiExpr('PEI_original'), 'fill-opacity': opacity }
+    });
+    m.addLayer({
+        id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl,
+        paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] }
+    });
+    m.addLayer({
+        id: 'tracts-hover', type: 'line', source: 'src', 'source-layer': ts.sl,
+        paint: { 'line-color': '#00d4aa', 'line-width': 2, 'line-opacity': 1 },
+        filter: ['==', 'GEOID', '']
+    });
+}
+
+function addBackgroundLayers(m) {
+    Object.entries(TS).forEach(([yr, ts]) => {
+        if (!ts.sl) return;
+        if (!m.getSource(`src-${yr}`)) m.addSource(`src-${yr}`, { type: 'vector', url: ts.url });
+        if (!m.getLayer(`bg-${yr}`)) m.addLayer({
+            id: `bg-${yr}`, type: 'fill', source: `src-${yr}`, 'source-layer': ts.sl,
+            paint: { 'fill-opacity': 0, 'fill-color': '#000' }
+        });
+    });
+}
+
+function peiExpr(col) { return ['interpolate', ['linear'], ['coalesce', ['get', col], 0], ...PEI_GRAD]; }
+function diffExpr(c1, c2) { return ['interpolate', ['linear'], ['-', ['coalesce', ['get', c1], 0], ['coalesce', ['get', c2], 0]], ...DIFF_GRAD]; }
+
+function updateLayer() {
+    if (!map.getLayer('tracts-fill')) return;
+    let expr;
+    if (mode === 'single') expr = peiExpr(document.getElementById('pei-sel').value);
+    else if (mode === 'diff') {
+        const d = document.getElementById('diff-sel').value;
+        expr = d === 'orig-new' ? diffExpr('PEI_original', 'PEI_new') : diffExpr('PEI_original', 'PEI_combined');
+    }
+    if (expr) map.setPaintProperty('tracts-fill', 'fill-color', expr);
+    map.setPaintProperty('tracts-fill', 'fill-opacity', opacity);
+    updateLegend(); updateStats();
+}
+
+// ════════════════════════ MODE ════════════════════════
+function setMode(m) {
+    mode = m;
+    ['single', 'diff', 'pswipe', 'yswipe'].forEach(x => document.getElementById('m-' + x).classList.toggle('on', x === m));
+    document.getElementById('ctl-year').style.display = ['single', 'diff'].includes(m) ? '' : 'none';
+    document.getElementById('ctl-single').style.display = m === 'single' ? '' : 'none';
+    document.getElementById('ctl-diff').style.display = m === 'diff' ? '' : 'none';
+    document.getElementById('ctl-pswipe').style.display = m === 'pswipe' ? '' : 'none';
+    document.getElementById('ctl-yswipe').style.display = m === 'yswipe' ? '' : 'none';
+    document.getElementById('map').style.display = ['pswipe', 'yswipe'].includes(m) ? 'none' : '';
+    document.getElementById('cmp').style.display = ['pswipe', 'yswipe'].includes(m) ? 'block' : 'none';
+    document.getElementById('stats').style.display = ['pswipe', 'yswipe'].includes(m) ? 'none' : '';
+    if (['pswipe', 'yswipe'].includes(m)) { teardownSplit(); initSplit(); }
+    else { teardownSplit(); updateLayer(); }
+    updateLegend();
+}
+
+// ════════════════════════ YEAR ════════════════════════
+function setYear(yr) {
+    year = yr;
+    ['2013', '2017', '2022'].forEach(y => document.getElementById('y-' + y).classList.toggle('on', y === yr));
+    addLayers(map, yr); updateLayer();
+}
+function setPSwipeYear(yr) {
+    pSwipeYear = yr;
+    ['2013', '2017', '2022'].forEach(y => document.getElementById('ps-' + y).classList.toggle('on', y === yr));
+    if (cmpObj) { teardownSplit(); initSplit(); }
+}
+
+// ════════════════════════ BASEMAP ════════════════════════
+function setBase(b) {
+    base = b;
+    ['light', 'dark', 'satellite', 'streets'].forEach(x => document.getElementById('b-' + x).classList.toggle('on', x === b));
+    if (['pswipe', 'yswipe'].includes(mode)) { teardownSplit(); initSplit(); return; }
+    const c = map.getCenter(), z = map.getZoom();
+    map.once('style.load', () => { addLayers(map, year); addBackgroundLayers(map); map.setCenter(c); map.setZoom(z); });
+    map.setStyle(BASES[b]);
+}
+
+// ════════════════════════ OPACITY ════════════════════════
+function setOpacity(v) {
+    opacity = v / 100;
+    document.getElementById('opa-v').textContent = v + '%';
+    if (map.getLayer('tracts-fill')) map.setPaintProperty('tracts-fill', 'fill-opacity', opacity);
+    [bMap, aMap].forEach(m => { if (m?.getLayer('tracts-fill')) m.setPaintProperty('tracts-fill', 'fill-opacity', opacity); });
+}
+
+// ════════════════════════ SPLIT / SWIPE ════════════════════════
+function teardownSplit() {
+    if (bMap) { try { bMap.remove(); } catch (e) { } }
+    if (aMap) { try { aMap.remove(); } catch (e) { } }
+    cmpObj = null; bMap = null; aMap = null;
+    document.getElementById('cmp').innerHTML = '<div id="before-map"></div><div id="after-map"></div>';
+}
+function initSplit() {
+    const c = map.getCenter(), z = map.getZoom(), s = BASES[base];
+    bMap = new mapboxgl.Map({ container: 'before-map', style: s, center: c, zoom: z });
+    aMap = new mapboxgl.Map({ container: 'after-map', style: s, center: c, zoom: z });
+    let bl = false, al = false;
+    function tryInit() {
+        if (!bl || !al) return;
+        if (mode === 'pswipe') {
+            addSplitLayerByVersion(bMap, TS[pSwipeYear], 'left-pei', 'before-map');
+            addSplitLayerByVersion(aMap, TS[pSwipeYear], 'right-pei', 'after-map');
+        } else { // yswipe
+            const lyr = document.getElementById('left-yr').value;
+            const ryr = document.getElementById('right-yr').value;
+            const pei = document.getElementById('yswipe-pei').value;
+            addSplitLayerByYear(bMap, TS[lyr], pei, lyr, 'before-map');
+            addSplitLayerByYear(aMap, TS[ryr], pei, ryr, 'after-map');
+        }
+        cmpObj = new mapboxgl.Compare(bMap, aMap, '#cmp', {});
+    }
+    bMap.on('load', () => { bl = true; tryInit(); });
+    aMap.on('load', () => { al = true; tryInit(); });
+}
+function addSplitLabel(containerId, text) {
+    const el = document.createElement('div');
+    el.className = 'cmp-year-label';
+    el.textContent = text;
+    document.getElementById(containerId).appendChild(el);
+}
+function addSplitLayerByVersion(m, ts, selId, containerId) {
+    const col = document.getElementById(selId).value;
+    m.addSource('src', { type: 'vector', url: ts.url });
+    m.addLayer({ id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl, paint: { 'fill-color': peiExpr(col), 'fill-opacity': opacity } });
+    m.addLayer({ id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl, paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] } });
+    addSplitLabel(containerId, PEI_LABELS[col] || col);
+}
+function addSplitLayerByYear(m, ts, peiCol, yr, containerId) {
+    m.addSource('src', { type: 'vector', url: ts.url });
+    m.addLayer({ id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl, paint: { 'fill-color': peiExpr(peiCol), 'fill-opacity': opacity } });
+    m.addLayer({ id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl, paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] } });
+    addSplitLabel(containerId, yr);
+}
+function updateSplit() {
+    if (!bMap || !aMap) return;
+    if (mode === 'pswipe') {
+        const lc = document.getElementById('left-pei').value;
+        const rc = document.getElementById('right-pei').value;
+        if (bMap.getLayer('tracts-fill')) bMap.setPaintProperty('tracts-fill', 'fill-color', peiExpr(lc));
+        if (aMap.getLayer('tracts-fill')) aMap.setPaintProperty('tracts-fill', 'fill-color', peiExpr(rc));
+        const leftLabel = document.querySelector('#before-map .cmp-year-label');
+        const rightLabel = document.querySelector('#after-map .cmp-year-label');
+        if (leftLabel) leftLabel.textContent = PEI_LABELS[lc] || lc;
+        if (rightLabel) rightLabel.textContent = PEI_LABELS[rc] || rc;
+    } else { teardownSplit(); initSplit(); }
+}
+
+// ════════════════════════ STATS ════════════════════════
+function updateStats() {
+    clearTimeout(statsTimer);
+    statsTimer = setTimeout(() => {
+        if (!map.getLayer('tracts-fill')) return;
+        const feats = map.queryRenderedFeatures({ layers: ['tracts-fill'] });
+        if (!feats.length) {
+            resetStats('No tracts visible in viewport');
+            return;
+        }
+        const col = mode === 'single' ? document.getElementById('pei-sel').value : 'PEI_original';
+        const vals = feats.map(f => +f.properties[col]).filter(v => !isNaN(v));
+        if (!vals.length) {
+            resetStats('No PEI values available');
+            return;
+        }
+        const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+        statsNoteEl.textContent = 'Current viewport';
+        document.getElementById('s-n').textContent = feats.length.toLocaleString();
+        document.getElementById('s-mean').textContent = mean.toFixed(3);
+        document.getElementById('s-min').textContent = Math.min(...vals).toFixed(3);
+        document.getElementById('s-max').textContent = Math.max(...vals).toFixed(3);
+    }, 350);
+}
+
+// ════════════════════════ LEGEND ════════════════════════
+function updateLegend() {
+    const bar = document.getElementById('leg-b'), labs = document.getElementById('leg-l'), ttl = document.getElementById('leg-t');
+    if (mode === 'single') {
+        ttl.textContent = PEI_LABELS[document.getElementById('pei-sel').value] || 'PEI Score';
+        bar.style.background = 'linear-gradient(to right,#d73027,#fc8d59,#ffffbf,#91cf60,#1a9850)';
+        labs.innerHTML = '<span>0.0</span><span>0.25</span><span>0.5</span><span>0.75</span><span>1.0</span>';
+    } else if (mode === 'diff') {
+        const d = document.getElementById('diff-sel').value;
+        ttl.textContent = d === 'orig-new' ? 'Orig − New' : 'Orig − Combined';
+        bar.style.background = 'linear-gradient(to right,#1a9850,#91cf60,#ffffbf,#fc8d59,#d73027)';
+        labs.innerHTML = '<span>−0.5</span><span>0</span><span>+0.5</span>';
+    } else {
+        ttl.textContent = mode === 'yswipe' ? 'Year Comparison' : 'PEI Version Compare';
+        bar.style.background = 'linear-gradient(to right,#d73027,#fc8d59,#ffffbf,#91cf60,#1a9850)';
+        labs.innerHTML = '<span>0.0</span><span>0.5</span><span>1.0</span>';
+    }
+}
+
+// ════════════════════════ POPUP WITH 3-YEAR TIMELINE ════════════════════════
+function onTractClick(e) {
+    const geoid = e.features[0].properties.GEOID;
+
+    // Highlight the clicked tract
+    if (map.getLayer('tracts-hover')) {
+        map.setFilter('tracts-hover', ['==', 'GEOID', geoid]);
+    }
+
+    // Collect data from all 3 background year layers
+    const allLayerIds = ['bg-2013', 'bg-2017', 'bg-2022'].filter(id => map.getLayer(id));
+    const allFeats = map.queryRenderedFeatures(e.point, { layers: allLayerIds });
+    const yearData = {};
+    allFeats.forEach(f => {
+        if (f.properties.GEOID !== geoid) return;
+        const yr = f.layer.id.replace('bg-', '');
+        if (!yearData[yr]) yearData[yr] = f.properties;
+    });
+
+    const p = yearData[year] || e.features[0].properties;
+    const f = v => (v != null && !isNaN(v)) ? (+v).toFixed(3) : '—';
+    const n = v => (v != null) ? (+v).toLocaleString() : '—';
+
+    // PEI bar helper
+    const bar = (label, val) => {
+        const num = +val || 0, col = lerp3('#d73027', '#ffffbf', '#1a9850', num);
+        return `<div class="pbar-row"><div class="pbar-h"><span class="pk">${label}</span><span class="pv">${f(val)}</span></div>
+    <div class="pbar-bg"><div class="pbar-f" style="width:${(num * 100).toFixed(1)}%;background:${col}"></div></div></div>`;
+    };
+
+    // 3-year timeline table
+    const yrs = ['2013', '2017', '2022'];
+    const peis = ['PEI_original', 'PEI_new', 'PEI_combined'];
+    const pShort = { PEI_original: 'Original', PEI_new: 'New', PEI_combined: 'Combined' };
+    let tlRows = '';
+    yrs.forEach(yr => {
+        const d = yearData[yr];
+        const vals = peis.map(pc => {
+            const v = d ? +d[pc] : null;
+            const col = d ? lerp3('#d73027', '#ffffbf', '#1a9850', v || 0) : '#666';
+            return `<td><span style="background:${col};color:#000;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600">${d && v != null ? v.toFixed(2) : '—'}</span></td>`;
+        }).join('');
+        tlRows += `<tr><td class="tl-yr"><b>${yr}</b></td>${vals}</tr>`;
+    });
+
+    const html = `
+  <div class="ph">
+    <div class="pid">GEOID: ${p.GEOID || '—'}</div>
+    <div class="ploc">${p.NAMELSADCO || '—'}, ${p.STATE_NAME || '—'}</div>
+  </div>
+  <div class="pb">
+    <div class="pst">PEI Scores — ${year}</div>
+    ${bar('PEI Original', p.PEI_original)}
+    ${bar('PEI New', p.PEI_new)}
+    ${bar('PEI Combined', p.PEI_combined)}
+    <div class="pst" style="margin-top:10px">📅 3-Year Timeline</div>
+    <table class="tl-table">
+      <thead><tr><th></th><th>Original</th><th>New</th><th>Combined</th></tr></thead>
+      <tbody>${tlRows}</tbody>
+    </table>
+    <div class="pst">Indices (${year}, Normalized)</div>
+    <div class="pgr">
+      <div class="pr"><span class="pk">CDI</span><span class="pv">${f(p.CDI)}</span></div>
+      <div class="pr"><span class="pk">IDI</span><span class="pv">${f(p.IDI)}</span></div>
+      <div class="pr"><span class="pk">LDI</span><span class="pv">${f(p.LDI)}</span></div>
+      <div class="pr"><span class="pk">PDI</span><span class="pv">${f(p.PDI)}</span></div>
+      <div class="pr"><span class="pk">RSI</span><span class="pv">${f(p.RSI)}</span></div>
+      <div class="pr"><span class="pk">GSI</span><span class="pv">${f(p.GSI)}</span></div>
+      <div class="pr"><span class="pk">BI</span><span class="pv">${f(p.BI)}</span></div>
+      <div class="pr"><span class="pk">PTAL</span><span class="pv">${f(p.PTAL)}</span></div>
+    </div>
+    <div class="pst">Demographics</div>
+    <div class="pgr">
+      <div class="pr"><span class="pk">Population</span><span class="pv">${n(p['Population Count'])}</span></div>
+      <div class="pr"><span class="pk">Commercial</span><span class="pv">${n(p['Commercial Count'])}</span></div>
+      <div class="pr"><span class="pk">Intersections</span><span class="pv">${n(p['Intersection Count'])}</span></div>
+      <div class="pr"><span class="pk">Area (km²)</span><span class="pv">${p['Polygon Area'] ? (+p['Polygon Area']).toFixed(1) : '—'}</span></div>
+    </div>
+  </div>`;
+    popup.setLngLat(e.lngLat).setHTML(html).addTo(map);
+}
+
+function lerp3(c0, cMid, c1, t) {
+    let a, b, tt;
+    if (t <= 0.5) { a = c0; b = cMid; tt = t * 2; } else { a = cMid; b = c1; tt = (t - 0.5) * 2; }
+    const h = s => parseInt(s.slice(1), 16), ah = h(a), bh = h(b);
+    const r = Math.round(((ah >> 16) & 255) + (((bh >> 16) & 255) - ((ah >> 16) & 255)) * tt);
+    const g = Math.round(((ah >> 8) & 255) + (((bh >> 8) & 255) - ((ah >> 8) & 255)) * tt);
+    const bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * tt);
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bl.toString(16).padStart(2, '0')}`;
+}
+Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity });
+    
+
+
