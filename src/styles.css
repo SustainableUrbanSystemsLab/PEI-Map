@@ -2,62 +2,71 @@
 
 :root {
     color-scheme: dark;
-    --sb: 275px;
+    --sb: 285px;
     --bg: #0d1117;
-    --panel: #161b27;
-    --card: #1e2535;
-    --bdr: #2a3148;
-    --acc: #00d4aa;
-    --txt: #e2e8f0;
-    --mut: #64748b;
-    --panel-grad-start: #161b27;
-    --panel-grad-end: #1e2535;
-    --control-bg: rgba(30, 37, 53, .95);
-    --floating-bg: rgba(22, 27, 39, .93);
-    --chip-bg: rgba(22, 27, 39, .85);
-    --geocoder-bg: rgba(22, 27, 39, .95);
-    --geocoder-hover: rgba(255, 255, 255, .05);
-    --geocoder-active: rgba(0, 212, 170, .14)
+    --panel: #161b22;
+    --card: #21262d;
+    --bdr: #30363d;
+    --acc: #2f81f7;
+    --txt: #c9d1d9;
+    --mut: #8b949e;
+    --panel-grad-start: #161b22;
+    --panel-grad-end: #0d1117;
+    --control-bg: #21262d;
+    --floating-bg: #161b22;
+    --chip-bg: #21262d;
+    --geocoder-bg: #161b22;
+    --geocoder-hover: #30363d;
+    --geocoder-active: #0d1117;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
 }
 
 :root[data-theme='light'] {
     color-scheme: light;
-    --bg: #eef3f8;
+    --bg: #f6f8fa;
     --panel: #ffffff;
-    --card: #f7fafd;
-    --bdr: #ccd7e3;
-    --acc: #0b8f7d;
-    --txt: #172533;
-    --mut: #5f7082;
+    --card: #f3f4f6;
+    --bdr: #d0d7de;
+    --acc: #0969da;
+    --txt: #24292f;
+    --mut: #57606a;
     --panel-grad-start: #ffffff;
-    --panel-grad-end: #edf3f8;
-    --control-bg: rgba(255, 255, 255, .96);
-    --floating-bg: rgba(255, 255, 255, .94);
-    --chip-bg: rgba(255, 255, 255, .9);
-    --geocoder-bg: rgba(255, 255, 255, .97);
-    --geocoder-hover: rgba(23, 37, 51, .05);
-    --geocoder-active: rgba(11, 143, 125, .12)
+    --panel-grad-end: #f6f8fa;
+    --control-bg: #f3f4f6;
+    --floating-bg: #ffffff;
+    --chip-bg: #f3f4f6;
+    --geocoder-bg: #ffffff;
+    --geocoder-hover: #f3f4f6;
+    --geocoder-active: #e1e4e8;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
 }
 
 @media (prefers-color-scheme: light) {
     :root:not([data-theme='light']):not([data-theme='dark']) {
-        color-scheme: light;
-        --bg: #eef3f8;
-        --panel: #ffffff;
-        --card: #f7fafd;
-        --bdr: #ccd7e3;
-        --acc: #0b8f7d;
-        --txt: #172533;
-        --mut: #5f7082;
-        --panel-grad-start: #ffffff;
-        --panel-grad-end: #edf3f8;
-        --control-bg: rgba(255, 255, 255, .96);
-        --floating-bg: rgba(255, 255, 255, .94);
-        --chip-bg: rgba(255, 255, 255, .9);
-        --geocoder-bg: rgba(255, 255, 255, .97);
-        --geocoder-hover: rgba(23, 37, 51, .05);
-        --geocoder-active: rgba(11, 143, 125, .12)
-    }
+    color-scheme: light;
+    --bg: #f6f8fa;
+    --panel: #ffffff;
+    --card: #f3f4f6;
+    --bdr: #d0d7de;
+    --acc: #0969da;
+    --txt: #24292f;
+    --mut: #57606a;
+    --panel-grad-start: #ffffff;
+    --panel-grad-end: #f6f8fa;
+    --control-bg: #f3f4f6;
+    --floating-bg: #ffffff;
+    --chip-bg: #f3f4f6;
+    --geocoder-bg: #ffffff;
+    --geocoder-hover: #f3f4f6;
+    --geocoder-active: #e1e4e8;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
 }
 
 * {
@@ -81,10 +90,11 @@ body {
     min-width: var(--sb);
     background: var(--panel);
     border-right: 1px solid var(--bdr);
+    box-shadow: var(--shadow-md);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    z-index: 10
+    z-index: 10;
 }
 
 .sbh {
@@ -128,36 +138,40 @@ body {
 
 .br {
     display: flex;
-    gap: 3px;
-    flex-wrap: wrap
+    gap: 4px;
+    flex-wrap: wrap;
+    background: var(--card);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--bdr);
 }
 
 .btn {
     flex: 1;
-    padding: 5px 5px;
-    border: 1px solid var(--bdr);
-    background: var(--card);
+    padding: 6px 8px;
+    border: none;
+    background: transparent;
     color: var(--mut);
     border-radius: 6px;
     cursor: pointer;
     font-size: 11px;
-    font-weight: 500;
-    transition: all .15s;
+    font-weight: 600;
+    transition: all .2s ease;
     text-align: center;
     font-family: inherit;
-    white-space: nowrap
+    white-space: nowrap;
 }
 
 .btn:hover {
-    border-color: var(--acc);
-    color: var(--acc)
+    color: var(--txt);
+    background: var(--geocoder-hover);
 }
 
 .btn.on {
-    background: var(--acc);
-    border-color: var(--acc);
-    color: #0d1117;
-    font-weight: 700
+    background: var(--panel);
+    color: var(--txt);
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn:focus-visible,
@@ -173,19 +187,24 @@ input[type='range']:focus-visible,
 
 select {
     width: 100%;
-    padding: 6px 8px;
+    padding: 8px 10px;
     background: var(--card);
     border: 1px solid var(--bdr);
-    border-radius: 6px;
+    border-radius: 8px;
     color: var(--txt);
     font-size: 12px;
     font-family: inherit;
     cursor: pointer;
-    outline: none
+    outline: none;
+    transition: all .2s ease;
+}
+select:hover {
+    border-color: var(--mut);
 }
 
 select:focus {
-    border-color: var(--acc)
+    border-color: var(--acc);
+    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.2);
 }
 
 .hint {
@@ -204,19 +223,24 @@ select:focus {
 input[type=range] {
     flex: 1;
     -webkit-appearance: none;
-    height: 3px;
+    height: 4px;
     background: var(--bdr);
     border-radius: 2px;
-    outline: none
+    outline: none;
 }
 
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 13px;
-    height: 13px;
+    width: 16px;
+    height: 16px;
     background: var(--acc);
     border-radius: 50%;
-    cursor: pointer
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform .1s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
 }
 
 .sv {
@@ -300,12 +324,12 @@ input[type=range]::-webkit-slider-thumb {
 .fp {
     position: absolute;
     background: var(--floating-bg);
-    backdrop-filter: blur(8px);
     border: 1px solid var(--bdr);
-    border-radius: 10px;
-    padding: 11px 13px;
+    border-radius: 12px;
+    padding: 12px 14px;
     font-size: 12px;
-    z-index: 5
+    z-index: 5;
+    box-shadow: var(--shadow-lg);
 }
 
 #stats {
@@ -448,11 +472,11 @@ input[type=range]::-webkit-slider-thumb {
 .mapboxgl-popup-content {
     background: var(--panel) !important;
     border: 1px solid var(--bdr) !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     padding: 0 !important;
     color: var(--txt) !important;
-    max-width: 300px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, .6) !important
+    max-width: 320px;
+    box-shadow: var(--shadow-lg) !important;
 }
 
 .mapboxgl-popup-close-button {
@@ -487,26 +511,40 @@ input[type=range]::-webkit-slider-thumb {
 .ptabs {
     display: flex;
     gap: 4px;
-    margin-bottom: 8px
+    margin-bottom: 8px;
+    background: var(--card);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--bdr);
 }
 
 .ptab {
     flex: 1;
-    border: 1px solid var(--bdr);
-    background: var(--card);
+    border: none;
+    background: transparent;
     color: var(--mut);
-    border-radius: 999px;
-    padding: 5px 0;
+    border-radius: 6px;
+    padding: 6px 0;
     font-size: 10px;
     font-weight: 700;
     font-family: inherit;
-    cursor: pointer
+    cursor: pointer;
+    transition: all .2s ease;
+}
+.ptab:hover {
+    color: var(--txt);
+    background: var(--geocoder-hover);
+}
+
+.ptab:hover {
+    color: var(--txt);
+    background: var(--geocoder-hover);
 }
 
 .ptab.on {
-    background: var(--acc);
-    border-color: var(--acc);
-    color: #0d1117
+    background: var(--panel);
+    color: var(--txt);
+    box-shadow: var(--shadow-sm);
 }
 
 .pst {
