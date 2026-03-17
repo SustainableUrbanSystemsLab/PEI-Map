@@ -32,6 +32,19 @@ const PEI_LABELS = {
     CDI: 'Commercial Density', IDI: 'Intersection Density', LDI: 'Land Use Diversity', PDI: 'Population Density',
     RSI: 'Road Safety Index', GSI: 'Green Space Index', BI: 'Bike Infrastructure', PTAL: 'Public Transit Access'
 };
+const STATE_FIPS_NAMES = {
+    '01': 'Alabama', '02': 'Alaska', '04': 'Arizona', '05': 'Arkansas', '06': 'California', '08': 'Colorado',
+    '09': 'Connecticut', '10': 'Delaware', '11': 'District of Columbia', '12': 'Florida', '13': 'Georgia',
+    '15': 'Hawaii', '16': 'Idaho', '17': 'Illinois', '18': 'Indiana', '19': 'Iowa', '20': 'Kansas',
+    '21': 'Kentucky', '22': 'Louisiana', '23': 'Maine', '24': 'Maryland', '25': 'Massachusetts',
+    '26': 'Michigan', '27': 'Minnesota', '28': 'Mississippi', '29': 'Missouri', '30': 'Montana',
+    '31': 'Nebraska', '32': 'Nevada', '33': 'New Hampshire', '34': 'New Jersey', '35': 'New Mexico',
+    '36': 'New York', '37': 'North Carolina', '38': 'North Dakota', '39': 'Ohio', '40': 'Oklahoma',
+    '41': 'Oregon', '42': 'Pennsylvania', '44': 'Rhode Island', '45': 'South Carolina', '46': 'South Dakota',
+    '47': 'Tennessee', '48': 'Texas', '49': 'Utah', '50': 'Vermont', '51': 'Virginia', '53': 'Washington',
+    '54': 'West Virginia', '55': 'Wisconsin', '56': 'Wyoming', '60': 'American Samoa', '66': 'Guam',
+    '69': 'Northern Mariana Islands', '72': 'Puerto Rico', '78': 'U.S. Virgin Islands'
+};
 
 // ════════════════════════ STATE ════════════════════════
 const colorSchemeMq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -62,6 +75,40 @@ function resetStats(message = 'Current viewport') {
     document.getElementById('s-mean').textContent = '-';
     document.getElementById('s-min').textContent = '-';
     document.getElementById('s-max').textContent = '-';
+}
+
+function getPropValue(props, keys) {
+    if (!props) return null;
+    const entries = Object.entries(props);
+    for (const key of keys) {
+        if (props[key] != null && `${props[key]}`.trim() !== '') return `${props[key]}`.trim();
+        const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const match = entries.find(([propKey, propValue]) => (
+            propValue != null &&
+            `${propValue}`.trim() !== '' &&
+            propKey.toLowerCase().replace(/[^a-z0-9]/g, '') === normalizedKey
+        ));
+        if (match) return `${match[1]}`.trim();
+    }
+    return null;
+}
+
+function getStateName(props) {
+    const explicitState = getPropValue(props, ['STATE_NAME', 'STATE', 'STATENAME', 'STUSPS', 'STATE_ABBR', 'STATEABBR']);
+    if (explicitState) return explicitState;
+    const geoid = getPropValue(props, ['GEOID']);
+    if (geoid && geoid.length >= 2) return STATE_FIPS_NAMES[geoid.slice(0, 2)] || null;
+    return null;
+}
+
+function getCountyName(props) {
+    const explicitCounty = getPropValue(props, ['NAMELSADCO', 'COUNTY_NAME', 'COUNTYNAME', 'COUNTY_NAM', 'COUNTY', 'COUNTYNAMELSAD']);
+    if (explicitCounty) return explicitCounty;
+    const countyFips = getPropValue(props, ['COUNTYFP', 'COUNTYFP20', 'COUNTYFP10']);
+    if (countyFips) return `County FIPS ${countyFips}`;
+    const geoid = getPropValue(props, ['GEOID']);
+    if (geoid && geoid.length >= 5) return `County FIPS ${geoid.slice(2, 5)}`;
+    return null;
 }
 
 function getSystemBase() {
@@ -425,10 +472,12 @@ function onTractClick(e) {
         tlRows += `<tr><td class="tl-yr"><b>${yr}</b></td>${vals}</tr>`;
     });
 
+    const countyName = getCountyName(p) || '-';
+    const stateName = getStateName(p) || '-';
     const html = `
   <div class="ph">
     <div class="pid">GEOID: ${p.GEOID || '—'}</div>
-    <div class="ploc">${p.NAMELSADCO || '—'}, ${p.STATE_NAME || '—'}</div>
+    <div class="ploc">${countyName}, ${stateName}</div>
   </div>
   <div class="pb">
     <div class="pst">PEI Scores — ${year}</div>
