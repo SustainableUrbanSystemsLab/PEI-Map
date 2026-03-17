@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
+    color-scheme: dark light;
     --sb: 275px;
     --bg: #0d1117;
     --panel: #161b27;
@@ -8,7 +9,35 @@
     --bdr: #2a3148;
     --acc: #00d4aa;
     --txt: #e2e8f0;
-    --mut: #64748b
+    --mut: #64748b;
+    --panel-grad-start: #161b27;
+    --panel-grad-end: #1e2535;
+    --control-bg: rgba(30, 37, 53, .95);
+    --floating-bg: rgba(22, 27, 39, .93);
+    --chip-bg: rgba(22, 27, 39, .85);
+    --geocoder-bg: rgba(22, 27, 39, .95);
+    --geocoder-hover: rgba(255, 255, 255, .05);
+    --geocoder-active: rgba(0, 212, 170, .14)
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #eef3f8;
+        --panel: #ffffff;
+        --card: #f7fafd;
+        --bdr: #ccd7e3;
+        --acc: #0b8f7d;
+        --txt: #172533;
+        --mut: #5f7082;
+        --panel-grad-start: #ffffff;
+        --panel-grad-end: #edf3f8;
+        --control-bg: rgba(255, 255, 255, .96);
+        --floating-bg: rgba(255, 255, 255, .94);
+        --chip-bg: rgba(255, 255, 255, .9);
+        --geocoder-bg: rgba(255, 255, 255, .97);
+        --geocoder-hover: rgba(23, 37, 51, .05);
+        --geocoder-active: rgba(11, 143, 125, .12)
+    }
 }
 
 * {
@@ -41,7 +70,7 @@ body {
 .sbh {
     padding: 16px 14px 12px;
     border-bottom: 1px solid var(--bdr);
-    background: linear-gradient(135deg, #161b27, #1e2535);
+    background: linear-gradient(135deg, var(--panel-grad-start), var(--panel-grad-end));
     position: relative
 }
 
@@ -169,7 +198,7 @@ input[type=range]::-webkit-slider-thumb {
 #sb-toggle,
 #sb-close {
     border: 1px solid var(--bdr);
-    background: rgba(30, 37, 53, .95);
+    background: var(--control-bg);
     color: var(--txt);
     border-radius: 8px;
     font-size: 11px;
@@ -184,7 +213,7 @@ input[type=range]::-webkit-slider-thumb {
     bottom: 92px;
     z-index: 6;
     border: 1px solid var(--bdr);
-    background: rgba(30, 37, 53, .95);
+    background: var(--control-bg);
     color: var(--txt);
     border-radius: 8px;
     padding: 8px 10px;
@@ -239,7 +268,7 @@ input[type=range]::-webkit-slider-thumb {
 
 .fp {
     position: absolute;
-    background: rgba(22, 27, 39, .93);
+    background: var(--floating-bg);
     backdrop-filter: blur(8px);
     border: 1px solid var(--bdr);
     border-radius: 10px;
@@ -314,15 +343,57 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 .mapboxgl-ctrl-geocoder {
+    background: var(--geocoder-bg) !important;
+    border: 1px solid var(--bdr) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18) !important;
     min-width: 0 !important;
     width: min(34vw, 420px) !important;
     max-width: min(34vw, 420px) !important
 }
 
+.mapboxgl-ctrl-geocoder--input {
+    background: transparent !important;
+    color: var(--txt) !important
+}
+
+.mapboxgl-ctrl-geocoder--input::placeholder {
+    color: var(--mut) !important
+}
+
+.mapboxgl-ctrl-geocoder--icon,
+.mapboxgl-ctrl-geocoder--icon path {
+    fill: var(--mut) !important
+}
+
+.mapboxgl-ctrl-geocoder--button {
+    background: transparent !important
+}
+
+.mapboxgl-ctrl-geocoder--button:hover {
+    background: var(--geocoder-hover) !important
+}
+
+.mapboxgl-ctrl-geocoder .suggestions,
+.mapboxgl-ctrl-geocoder .suggestions-wrapper {
+    background: var(--geocoder-bg) !important;
+    border: 1px solid var(--bdr) !important;
+    color: var(--txt) !important
+}
+
+.mapboxgl-ctrl-geocoder .suggestions > li > a {
+    color: var(--txt) !important
+}
+
+.mapboxgl-ctrl-geocoder .suggestions > .active > a,
+.mapboxgl-ctrl-geocoder .suggestions > li > a:hover {
+    background: var(--geocoder-active) !important;
+    color: var(--txt) !important
+}
+
 .cmp-year-label {
     position: absolute;
     top: 12px;
-    background: rgba(22, 27, 39, .85);
+    background: var(--chip-bg);
     color: var(--acc);
     font-family: 'Inter', sans-serif;
     font-size: 13px;

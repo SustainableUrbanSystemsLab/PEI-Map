@@ -34,9 +34,11 @@ const PEI_LABELS = {
 };
 
 // ════════════════════════ STATE ════════════════════════
-let year = '2013', mode = 'single', base = 'light', opacity = 0.8;
+const colorSchemeMq = window.matchMedia('(prefers-color-scheme: dark)');
+let year = '2013', mode = 'single', base = colorSchemeMq.matches ? 'dark' : 'light', opacity = 0.8;
 let cmpObj = null, bMap = null, aMap = null, pSwipeYear = '2013';
 let statsTimer = null;
+let autoThemeBase = true;
 const popup = new mapboxgl.Popup({ closeButton: true, closeOnClick: false, maxWidth: '320px' });
 const mobileMq = window.matchMedia('(max-width: 980px)');
 const bodyEl = document.body;
@@ -61,6 +63,18 @@ function resetStats(message = 'Current viewport') {
     document.getElementById('s-min').textContent = '-';
     document.getElementById('s-max').textContent = '-';
 }
+
+function getSystemBase() {
+    return colorSchemeMq.matches ? 'dark' : 'light';
+}
+
+function syncBaseButtons() {
+    ['light', 'dark', 'satellite', 'streets'].forEach((x) => {
+        document.getElementById('b-' + x).classList.toggle('on', x === base);
+    });
+}
+
+syncBaseButtons();
 
 function setSidebarOpen(open) {
     bodyEl.classList.toggle('sb-open', !!open);
@@ -104,7 +118,7 @@ async function detectSourceLayers() {
 }
 
 // ════════════════════════ MAIN MAP ════════════════════════
-const map = new mapboxgl.Map({ container: 'map', style: BASES.light, center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, minZoom: 2 });
+const map = new mapboxgl.Map({ container: 'map', style: BASES[base], center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, minZoom: 2 });
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
 // Add Geocoder
@@ -121,6 +135,11 @@ map.addControl(
 // Add Scale Control
 map.addControl(new mapboxgl.ScaleControl({ maxWidth: 200, unit: 'imperial' }), 'bottom-left');
 map.on('click', closeSidebarIfMobile);
+colorSchemeMq.addEventListener('change', () => {
+    if (autoThemeBase && (base === 'light' || base === 'dark')) {
+        setBase(getSystemBase(), true);
+    }
+});
 
 map.on('load', async () => {
     await detectSourceLayers();
@@ -236,9 +255,11 @@ function setPSwipeYear(yr) {
 }
 
 // ════════════════════════ BASEMAP ════════════════════════
-function setBase(b) {
+function setBase(b, fromAuto = false) {
     base = b;
-    ['light', 'dark', 'satellite', 'streets'].forEach(x => document.getElementById('b-' + x).classList.toggle('on', x === b));
+    autoThemeBase = fromAuto && (b === 'light' || b === 'dark');
+    if (!fromAuto) autoThemeBase = false;
+    syncBaseButtons();
     if (['pswipe', 'yswipe'].includes(mode)) { teardownSplit(); initSplit(); return; }
     const c = map.getCenter(), z = map.getZoom();
     map.once('style.load', () => { addLayers(map, year); addBackgroundLayers(map); map.setCenter(c); map.setZoom(z); });
