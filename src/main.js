@@ -129,6 +129,15 @@ function getAreaKm2(props) {
     return null;
 }
 
+function getFirstAvailable(sources, getter) {
+    for (const source of sources) {
+        if (!source) continue;
+        const value = getter(source);
+        if (value != null && value !== '') return value;
+    }
+    return null;
+}
+
 function getSystemBase() {
     return colorSchemeMq.matches ? 'dark' : 'light';
 }
@@ -492,6 +501,7 @@ function onTractClick(e) {
     });
 
     const p = yearData[year] || e.features[0].properties;
+    const propertySources = [yearData[year], e.features[0].properties, yearData['2013'], yearData['2017'], yearData['2022']];
     const f = v => (v != null && !isNaN(v)) ? (+v).toFixed(3) : '—';
     const n = v => (v != null) ? (+v).toLocaleString() : '—';
 
@@ -517,12 +527,12 @@ function onTractClick(e) {
         tlRows += `<tr><td class="tl-yr"><b>${yr}</b></td>${vals}</tr>`;
     });
 
-    const countyName = getCountyName(p) || '-';
-    const stateName = getStateName(p) || '-';
-    const population = getNumericProp(p, ['Population Count', 'POPULATION_COUNT', 'POPULATIONCOUNT', 'POPULATION', 'TOTPOP', 'POP']);
-    const commercial = getNumericProp(p, ['Commercial Count', 'COMMERCIAL_COUNT', 'COMMERCIALCOUNT', 'COMMERCIAL', 'COMM_COUNT']);
-    const intersections = getNumericProp(p, ['Intersection Count', 'INTERSECTION_COUNT', 'INTERSECTIONCOUNT', 'INTERSECTIONS']);
-    const areaKm2 = getAreaKm2(p);
+    const countyName = getFirstAvailable(propertySources, getCountyName) || '-';
+    const stateName = getFirstAvailable(propertySources, getStateName) || '-';
+    const population = getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Population Count', 'POPULATION_COUNT', 'POPULATIONCOUNT', 'POPULATION', 'TOTPOP', 'POP']));
+    const commercial = getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Commercial Count', 'COMMERCIAL_COUNT', 'COMMERCIALCOUNT', 'COMMERCIAL', 'COMM_COUNT']));
+    const intersections = getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Intersection Count', 'INTERSECTION_COUNT', 'INTERSECTIONCOUNT', 'INTERSECTIONS']));
+    const areaKm2 = getFirstAvailable(propertySources, getAreaKm2);
     const html = `
   <div class="ph">
     <div class="pid">GEOID: ${p.GEOID || '—'}</div>
