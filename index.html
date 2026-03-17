@@ -59,7 +59,7 @@
 
         <!-- SINGLE controls -->
         <div class="sec" id="ctl-single">
-            <div class="lbl">Layer Display</div>
+            <label class="lbl" for="pei-sel">Layer Display</label>
             <select id="pei-sel" onchange="updateLayer()">
                 <option value="PEI_original">PEI Original (CDI·IDI·LDI·PDI)</option>
                 <option value="PEI_new">PEI New (RSI·GSI·BI·PTAL)</option>
@@ -81,7 +81,7 @@
 
         <!-- PEI DIFF controls -->
         <div class="sec" id="ctl-diff" style="display:none">
-            <div class="lbl">Compare</div>
+            <label class="lbl" for="diff-sel">Compare</label>
             <select id="diff-sel" onchange="updateLayer()">
                 <option value="orig-new">Original − New</option>
                 <option value="orig-comb">Original − Combined</option>
@@ -97,7 +97,7 @@
                 <button class="btn" id="ps-2017" onclick="setPSwipeYear('2017')">2017</button>
                 <button class="btn" id="ps-2022" onclick="setPSwipeYear('2022')">2022</button>
             </div>
-            <div class="sub-lbl">Left Map</div>
+            <label class="sub-lbl" for="left-pei">Left Map</label>
             <select id="left-pei" onchange="updateSplit()">
                 <option value="PEI_original">PEI Original</option>
                 <option value="PEI_new">PEI New</option>
@@ -115,7 +115,7 @@
                     <option value="PTAL">PTAL</option>
                 </optgroup>
             </select>
-            <div class="sub-lbl">Right Map</div>
+            <label class="sub-lbl" for="right-pei">Right Map</label>
             <select id="right-pei" onchange="updateSplit()">
                 <option value="PEI_new">PEI New</option>
                 <option value="PEI_original">PEI Original</option>
@@ -137,7 +137,7 @@
 
         <!-- YEAR SWIPE controls -->
         <div class="sec" id="ctl-yswipe" style="display:none">
-            <div class="lbl">Layer Display</div>
+            <label class="lbl" for="yswipe-pei">Layer Display</label>
             <select id="yswipe-pei" onchange="updateSplit()">
                 <option value="PEI_original">PEI Original</option>
                 <option value="PEI_new">PEI New</option>
@@ -155,13 +155,13 @@
                     <option value="PTAL">PTAL</option>
                 </optgroup>
             </select>
-            <div class="sub-lbl">Left Year</div>
+            <label class="sub-lbl" for="left-yr">Left Year</label>
             <select id="left-yr" onchange="updateSplit()">
                 <option value="2013">2013</option>
                 <option value="2017">2017</option>
                 <option value="2022">2022</option>
             </select>
-            <div class="sub-lbl">Right Year</div>
+            <label class="sub-lbl" for="right-yr">Right Year</label>
             <select id="right-yr" onchange="updateSplit()">
                 <option value="2022">2022</option>
                 <option value="2017">2017</option>
@@ -188,7 +188,7 @@
 
         <!-- OPACITY -->
         <div class="sec">
-            <div class="lbl">Layer Opacity</div>
+            <label class="lbl" for="opa">Layer Opacity</label>
             <div class="srow">
                 <input type="range" id="opa" min="0" max="100" value="80" oninput="setOpacity(this.value)">
                 <span class="sv" id="opa-v">80%</span>
