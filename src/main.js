@@ -53,6 +53,7 @@ let cmpObj = null, bMap = null, aMap = null, pSwipeYear = '2013';
 let statsTimer = null;
 let autoThemeBase = true;
 let themeMode = 'auto';
+let popupState = null;
 const popup = new mapboxgl.Popup({ closeButton: true, closeOnClick: false, maxWidth: '320px' });
 const mobileMq = window.matchMedia('(max-width: 980px)');
 const bodyEl = document.body;
@@ -136,6 +137,74 @@ function getFirstAvailable(sources, getter) {
         if (value != null && value !== '') return value;
     }
     return null;
+}
+
+function buildPopupHtml(state, activeYear) {
+    const yrs = ['2013', '2017', '2022'];
+    const peis = ['PEI_original', 'PEI_new', 'PEI_combined'];
+    const selectedYear = yrs.includes(activeYear) ? activeYear : state.defaultYear;
+    const p = state.yearData[selectedYear] || state.primaryProps || {};
+    const f = (v) => (v != null && !isNaN(v)) ? (+v).toFixed(3) : '—';
+    const n = (v) => (v != null) ? (+v).toLocaleString() : '—';
+    const bar = (label, val) => {
+        const num = +val || 0;
+        const col = lerp3('#d73027', '#ffffbf', '#1a9850', num);
+        return `<div class="pbar-row"><div class="pbar-h"><span class="pk">${label}</span><span class="pv">${f(val)}</span></div><div class="pbar-bg"><div class="pbar-f" style="width:${(num * 100).toFixed(1)}%;background:${col}"></div></div></div>`;
+    };
+    let tlRows = '';
+    yrs.forEach((yr) => {
+        const d = state.yearData[yr];
+        const vals = peis.map((pc) => {
+            const v = d ? +d[pc] : null;
+            const col = d ? lerp3('#d73027', '#ffffbf', '#1a9850', v || 0) : '#666';
+            return `<td><span style="background:${col};color:#000;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600">${d && v != null ? v.toFixed(2) : '—'}</span></td>`;
+        }).join('');
+        tlRows += `<tr><td class="tl-yr"><b>${yr}</b></td>${vals}</tr>`;
+    });
+    const yearTabs = yrs.map((yr) => `<button class="ptab${yr === selectedYear ? ' on' : ''}" type="button" aria-pressed="${yr === selectedYear}" onclick="setPopupYear('${yr}')">${yr}</button>`).join('');
+    const demographicsMissing = state.population == null && state.commercial == null && state.intersections == null && state.areaKm2 == null;
+    return `
+  <div class="ph">
+    <div class="pid">GEOID: ${state.geoid || '—'}</div>
+    <div class="ploc">${state.countyName}, ${state.stateName}</div>
+  </div>
+  <div class="pb">
+    <div class="ptabs">${yearTabs}</div>
+    <div class="pst">PEI Scores — ${selectedYear}</div>
+    ${bar('PEI Original', p.PEI_original)}
+    ${bar('PEI New', p.PEI_new)}
+    ${bar('PEI Combined', p.PEI_combined)}
+    <div class="pst" style="margin-top:10px">3-Year Timeline</div>
+    <table class="tl-table">
+      <thead><tr><th></th><th>Original</th><th>New</th><th>Combined</th></tr></thead>
+      <tbody>${tlRows}</tbody>
+    </table>
+    <div class="pst">Indices (${selectedYear}, Normalized)</div>
+    <div class="pgr">
+      <div class="pr"><span class="pk">CDI</span><span class="pv">${f(p.CDI)}</span></div>
+      <div class="pr"><span class="pk">IDI</span><span class="pv">${f(p.IDI)}</span></div>
+      <div class="pr"><span class="pk">LDI</span><span class="pv">${f(p.LDI)}</span></div>
+      <div class="pr"><span class="pk">PDI</span><span class="pv">${f(p.PDI)}</span></div>
+      <div class="pr"><span class="pk">RSI</span><span class="pv">${f(p.RSI)}</span></div>
+      <div class="pr"><span class="pk">GSI</span><span class="pv">${f(p.GSI)}</span></div>
+      <div class="pr"><span class="pk">BI</span><span class="pv">${f(p.BI)}</span></div>
+      <div class="pr"><span class="pk">PTAL</span><span class="pv">${f(p.PTAL)}</span></div>
+    </div>
+    <div class="pst">Demographics</div>
+    ${demographicsMissing ? '<div class="pd-note">Not available in the published Mapbox tilesets.</div>' : `
+    <div class="pgr">
+      <div class="pr"><span class="pk">Population</span><span class="pv">${n(state.population)}</span></div>
+      <div class="pr"><span class="pk">Commercial</span><span class="pv">${n(state.commercial)}</span></div>
+      <div class="pr"><span class="pk">Intersections</span><span class="pv">${n(state.intersections)}</span></div>
+      <div class="pr"><span class="pk">Area (km2)</span><span class="pv">${state.areaKm2 != null ? state.areaKm2.toFixed(1) : '-'}</span></div>
+    </div>`}
+  </div>`;
+}
+
+function setPopupYear(nextYear) {
+    if (!popupState || !popup.isOpen()) return;
+    popupState.activeYear = nextYear;
+    popup.setHTML(buildPopupHtml(popupState, nextYear));
 }
 
 function getSystemBase() {
@@ -485,89 +554,35 @@ function updateLegend() {
 function onTractClick(e) {
     const geoid = e.features[0].properties.GEOID;
 
-    // Highlight the clicked tract
     if (map.getLayer('tracts-hover')) {
         map.setFilter('tracts-hover', ['==', 'GEOID', geoid]);
     }
 
-    // Collect data from all 3 background year layers
     const allLayerIds = ['bg-2013', 'bg-2017', 'bg-2022'].filter(id => map.getLayer(id));
     const allFeats = map.queryRenderedFeatures(e.point, { layers: allLayerIds });
     const yearData = {};
-    allFeats.forEach(f => {
-        if (f.properties.GEOID !== geoid) return;
-        const yr = f.layer.id.replace('bg-', '');
-        if (!yearData[yr]) yearData[yr] = f.properties;
+    allFeats.forEach((feature) => {
+        if (feature.properties.GEOID !== geoid) return;
+        const yr = feature.layer.id.replace('bg-', '');
+        if (!yearData[yr]) yearData[yr] = feature.properties;
     });
 
     const p = yearData[year] || e.features[0].properties;
     const propertySources = [yearData[year], e.features[0].properties, yearData['2013'], yearData['2017'], yearData['2022']];
-    const f = v => (v != null && !isNaN(v)) ? (+v).toFixed(3) : '—';
-    const n = v => (v != null) ? (+v).toLocaleString() : '—';
-
-    // PEI bar helper
-    const bar = (label, val) => {
-        const num = +val || 0, col = lerp3('#d73027', '#ffffbf', '#1a9850', num);
-        return `<div class="pbar-row"><div class="pbar-h"><span class="pk">${label}</span><span class="pv">${f(val)}</span></div>
-    <div class="pbar-bg"><div class="pbar-f" style="width:${(num * 100).toFixed(1)}%;background:${col}"></div></div></div>`;
+    popupState = {
+        geoid,
+        yearData,
+        primaryProps: p,
+        countyName: getFirstAvailable(propertySources, getCountyName) || '-',
+        stateName: getFirstAvailable(propertySources, getStateName) || '-',
+        population: getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Population Count', 'POPULATION_COUNT', 'POPULATIONCOUNT', 'POPULATION', 'TOTPOP', 'POP'])),
+        commercial: getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Commercial Count', 'COMMERCIAL_COUNT', 'COMMERCIALCOUNT', 'COMMERCIAL', 'COMM_COUNT'])),
+        intersections: getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Intersection Count', 'INTERSECTION_COUNT', 'INTERSECTIONCOUNT', 'INTERSECTIONS'])),
+        areaKm2: getFirstAvailable(propertySources, getAreaKm2),
+        defaultYear: year,
+        activeYear: year
     };
-
-    // 3-year timeline table
-    const yrs = ['2013', '2017', '2022'];
-    const peis = ['PEI_original', 'PEI_new', 'PEI_combined'];
-    const pShort = { PEI_original: 'Original', PEI_new: 'New', PEI_combined: 'Combined' };
-    let tlRows = '';
-    yrs.forEach(yr => {
-        const d = yearData[yr];
-        const vals = peis.map(pc => {
-            const v = d ? +d[pc] : null;
-            const col = d ? lerp3('#d73027', '#ffffbf', '#1a9850', v || 0) : '#666';
-            return `<td><span style="background:${col};color:#000;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600">${d && v != null ? v.toFixed(2) : '—'}</span></td>`;
-        }).join('');
-        tlRows += `<tr><td class="tl-yr"><b>${yr}</b></td>${vals}</tr>`;
-    });
-
-    const countyName = getFirstAvailable(propertySources, getCountyName) || '-';
-    const stateName = getFirstAvailable(propertySources, getStateName) || '-';
-    const population = getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Population Count', 'POPULATION_COUNT', 'POPULATIONCOUNT', 'POPULATION', 'TOTPOP', 'POP']));
-    const commercial = getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Commercial Count', 'COMMERCIAL_COUNT', 'COMMERCIALCOUNT', 'COMMERCIAL', 'COMM_COUNT']));
-    const intersections = getFirstAvailable(propertySources, (source) => getNumericProp(source, ['Intersection Count', 'INTERSECTION_COUNT', 'INTERSECTIONCOUNT', 'INTERSECTIONS']));
-    const areaKm2 = getFirstAvailable(propertySources, getAreaKm2);
-    const html = `
-  <div class="ph">
-    <div class="pid">GEOID: ${p.GEOID || '—'}</div>
-    <div class="ploc">${countyName}, ${stateName}</div>
-  </div>
-  <div class="pb">
-    <div class="pst">PEI Scores — ${year}</div>
-    ${bar('PEI Original', p.PEI_original)}
-    ${bar('PEI New', p.PEI_new)}
-    ${bar('PEI Combined', p.PEI_combined)}
-    <div class="pst" style="margin-top:10px">📅 3-Year Timeline</div>
-    <table class="tl-table">
-      <thead><tr><th></th><th>Original</th><th>New</th><th>Combined</th></tr></thead>
-      <tbody>${tlRows}</tbody>
-    </table>
-    <div class="pst">Indices (${year}, Normalized)</div>
-    <div class="pgr">
-      <div class="pr"><span class="pk">CDI</span><span class="pv">${f(p.CDI)}</span></div>
-      <div class="pr"><span class="pk">IDI</span><span class="pv">${f(p.IDI)}</span></div>
-      <div class="pr"><span class="pk">LDI</span><span class="pv">${f(p.LDI)}</span></div>
-      <div class="pr"><span class="pk">PDI</span><span class="pv">${f(p.PDI)}</span></div>
-      <div class="pr"><span class="pk">RSI</span><span class="pv">${f(p.RSI)}</span></div>
-      <div class="pr"><span class="pk">GSI</span><span class="pv">${f(p.GSI)}</span></div>
-      <div class="pr"><span class="pk">BI</span><span class="pv">${f(p.BI)}</span></div>
-      <div class="pr"><span class="pk">PTAL</span><span class="pv">${f(p.PTAL)}</span></div>
-    </div>
-    <div class="pst">Demographics</div>
-    <div class="pgr">
-      <div class="pr"><span class="pk">Population</span><span class="pv">${n(population)}</span></div>
-      <div class="pr"><span class="pk">Commercial</span><span class="pv">${n(commercial)}</span></div>
-      <div class="pr"><span class="pk">Intersections</span><span class="pv">${n(intersections)}</span></div>
-      <div class="pr"><span class="pk">Area (km2)</span><span class="pv">${areaKm2 != null ? areaKm2.toFixed(1) : '-'}</span></div>
-    </div>
-  </div>`;
-    popup.setLngLat(e.lngLat).setHTML(html).addTo(map);
+    popup.setLngLat(e.lngLat).setHTML(buildPopupHtml(popupState, year)).addTo(map);
 }
 
 function lerp3(c0, cMid, c1, t) {
@@ -579,7 +594,7 @@ function lerp3(c0, cMid, c1, t) {
     const bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * tt);
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bl.toString(16).padStart(2, '0')}`;
 }
-Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity, setThemeMode });
+Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity, setThemeMode, setPopupYear });
     
 
 
