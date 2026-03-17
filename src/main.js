@@ -212,7 +212,12 @@ function getSystemBase() {
 }
 
 function syncBaseButtons() {
-    ['light', 'dark', 'satellite', 'streets'].forEach((x) => {
+    const autoBtn = document.getElementById('b-auto');
+    if (autoBtn) autoBtn.classList.toggle('on', autoThemeBase && (base === 'light' || base === 'dark'));
+    ['light', 'dark'].forEach((x) => {
+        document.getElementById('b-' + x).classList.toggle('on', !autoThemeBase && x === base);
+    });
+    ['satellite', 'streets'].forEach((x) => {
         document.getElementById('b-' + x).classList.toggle('on', x === base);
     });
 }
@@ -240,6 +245,14 @@ try {
     if (storedThemeMode) themeMode = storedThemeMode;
 } catch (error) {
     console.warn('Unable to read theme preference.', error);
+}
+
+if (themeMode === 'light' || themeMode === 'dark') {
+    base = themeMode;
+    autoThemeBase = false;
+} else if (themeMode === 'auto') {
+    base = getSystemBase();
+    autoThemeBase = true;
 }
 
 syncBaseButtons();
@@ -429,11 +442,17 @@ function setBase(b, fromAuto = false) {
     base = b;
     autoThemeBase = fromAuto && (b === 'light' || b === 'dark');
     if (!fromAuto) autoThemeBase = false;
+    if (b === 'light' || b === 'dark') setThemeMode(fromAuto ? 'auto' : b);
     syncBaseButtons();
     if (['pswipe', 'yswipe'].includes(mode)) { teardownSplit(); initSplit(); return; }
     const c = map.getCenter(), z = map.getZoom();
     map.once('style.load', () => { addLayers(map, year); addBackgroundLayers(map); map.setCenter(c); map.setZoom(z); });
     map.setStyle(BASES[b]);
+}
+
+function setMapTheme(mode) {
+    if (mode === 'auto') setBase(getSystemBase(), true);
+    else setBase(mode);
 }
 
 // ════════════════════════ OPACITY ════════════════════════
@@ -594,7 +613,7 @@ function lerp3(c0, cMid, c1, t) {
     const bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * tt);
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${bl.toString(16).padStart(2, '0')}`;
 }
-Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setOpacity, setThemeMode, setPopupYear });
+Object.assign(window, { setMode, setYear, updateLayer, setPSwipeYear, updateSplit, setBase, setMapTheme, setOpacity, setThemeMode, setPopupYear });
     
 
 

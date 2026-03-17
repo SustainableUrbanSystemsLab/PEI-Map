@@ -171,24 +171,19 @@
             </p>
         </div>
 
-        <div class="sec">
-            <div class="lbl">UI Theme</div>
-            <div class="br">
-                <button class="btn" id="theme-auto" onclick="setThemeMode('auto')">Auto</button>
-                <button class="btn" id="theme-light" onclick="setThemeMode('light')">Light</button>
-                <button class="btn" id="theme-dark" onclick="setThemeMode('dark')">Dark</button>
-            </div>
-        </div>
-
         <!-- BASEMAP -->
         <div class="sec">
-            <div class="lbl">Basemap</div>
+            <div class="lbl">Theme + Basemap</div>
             <div class="br">
-                <button class="btn on" id="b-light" onclick="setBase('light')">Light</button>
-                <button class="btn" id="b-dark" onclick="setBase('dark')">Dark</button>
+                <button class="btn" id="b-auto" onclick="setMapTheme('auto')">Auto</button>
+                <button class="btn on" id="b-light" onclick="setMapTheme('light')">Light</button>
+                <button class="btn" id="b-dark" onclick="setMapTheme('dark')">Dark</button>
+            </div>
+            <div class="br" style="margin-top:4px">
                 <button class="btn" id="b-satellite" onclick="setBase('satellite')">Sat</button>
                 <button class="btn" id="b-streets" onclick="setBase('streets')">Streets</button>
             </div>
+            <p class="hint">Auto, Light, and Dark sync the app theme and basemap together.</p>
         </div>
 
         <!-- OPACITY -->
