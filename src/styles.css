@@ -160,6 +160,17 @@ body {
     font-weight: 700
 }
 
+.btn:focus-visible,
+select:focus-visible,
+input[type='range']:focus-visible,
+#sb-toggle:focus-visible,
+#sb-close:focus-visible,
+#reset-view:focus-visible,
+.mapboxgl-popup-close-button:focus-visible {
+    outline: 2px solid var(--acc);
+    outline-offset: 2px
+}
+
 select {
     width: 100%;
     padding: 6px 8px;
@@ -391,6 +402,10 @@ input[type=range]::-webkit-slider-thumb {
 
 .mapboxgl-ctrl-geocoder--button:hover {
     background: var(--geocoder-hover) !important
+}
+
+.mapboxgl-ctrl-geocoder:focus-within {
+    box-shadow: 0 0 0 2px var(--acc) !important
 }
 
 .mapboxgl-ctrl-geocoder .suggestions,
