@@ -213,18 +213,37 @@ function getSystemBase() {
 
 function syncBaseButtons() {
     const autoBtn = document.getElementById('b-auto');
-    if (autoBtn) autoBtn.classList.toggle('on', autoThemeBase && (base === 'light' || base === 'dark'));
+    if (autoBtn) {
+        const isOn = autoThemeBase && (base === 'light' || base === 'dark');
+        autoBtn.classList.toggle('on', isOn);
+        autoBtn.setAttribute('aria-pressed', isOn);
+    }
     ['light', 'dark'].forEach((x) => {
-        document.getElementById('b-' + x).classList.toggle('on', !autoThemeBase && x === base);
+        const btn = document.getElementById('b-' + x);
+        if (btn) {
+            const isOn = !autoThemeBase && x === base;
+            btn.classList.toggle('on', isOn);
+            btn.setAttribute('aria-pressed', isOn);
+        }
     });
     ['satellite', 'streets'].forEach((x) => {
-        document.getElementById('b-' + x).classList.toggle('on', x === base);
+        const btn = document.getElementById('b-' + x);
+        if (btn) {
+            const isOn = x === base;
+            btn.classList.toggle('on', isOn);
+            btn.setAttribute('aria-pressed', isOn);
+        }
     });
 }
 
 function syncThemeButtons() {
     ['auto', 'light', 'dark'].forEach((x) => {
-        document.getElementById('theme-' + x)?.classList.toggle('on', x === themeMode);
+        const btn = document.getElementById('theme-' + x);
+        if (btn) {
+            const isOn = x === themeMode;
+            btn.classList.toggle('on', isOn);
+            btn.setAttribute('aria-pressed', isOn);
+        }
     });
 }
 
@@ -411,7 +430,14 @@ function updateLayer() {
 // ════════════════════════ MODE ════════════════════════
 function setMode(m) {
     mode = m;
-    ['single', 'diff', 'pswipe', 'yswipe'].forEach(x => document.getElementById('m-' + x).classList.toggle('on', x === m));
+    ['single', 'diff', 'pswipe', 'yswipe'].forEach(x => {
+        const btn = document.getElementById('m-' + x);
+        if (btn) {
+            const isOn = x === m;
+            btn.classList.toggle('on', isOn);
+            btn.setAttribute('aria-pressed', isOn);
+        }
+    });
     document.getElementById('ctl-year').style.display = ['single', 'diff'].includes(m) ? '' : 'none';
     document.getElementById('ctl-single').style.display = m === 'single' ? '' : 'none';
     document.getElementById('ctl-diff').style.display = m === 'diff' ? '' : 'none';
@@ -428,12 +454,26 @@ function setMode(m) {
 // ════════════════════════ YEAR ════════════════════════
 function setYear(yr) {
     year = yr;
-    ['2013', '2017', '2022'].forEach(y => document.getElementById('y-' + y).classList.toggle('on', y === yr));
+    ['2013', '2017', '2022'].forEach(y => {
+        const btn = document.getElementById('y-' + y);
+        if (btn) {
+            const isOn = y === yr;
+            btn.classList.toggle('on', isOn);
+            btn.setAttribute('aria-pressed', isOn);
+        }
+    });
     addLayers(map, yr); updateLayer();
 }
 function setPSwipeYear(yr) {
     pSwipeYear = yr;
-    ['2013', '2017', '2022'].forEach(y => document.getElementById('ps-' + y).classList.toggle('on', y === yr));
+    ['2013', '2017', '2022'].forEach(y => {
+        const btn = document.getElementById('ps-' + y);
+        if (btn) {
+            const isOn = y === yr;
+            btn.classList.toggle('on', isOn);
+            btn.setAttribute('aria-pressed', isOn);
+        }
+    });
     if (cmpObj) { teardownSplit(); initSplit(); }
 }
 
