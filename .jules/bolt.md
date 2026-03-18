@@ -1,3 +1,3 @@
-## 2024-05-18 - Avoid spread operator for Mapbox aggregation
-**Learning:** Mapbox can return hundreds of thousands of geometries easily from a layer. When aggregating features using Javascript array methods, specifically `Math.min(...vals)` and `Math.max(...vals)`, the amount of array items spread over arguments will blow up the V8 Javascript engine call stack size, crashing the client. In addition, iterating arrays using `.map()` followed by `.filter()` creates intermediate arrays, causing memory bloat and garbage collector pauses.
-**Action:** Use single-pass `for` loops without spread arguments (`...vals`) to compute aggregates (count, sum, min, max) without hitting maximum call stack size exceeded or wasting memory.
+## 2024-05-18 - Mapbox Source Layer Fetching
+**Learning:** The application fetches Mapbox vector tileset metadata to identify source layers. Doing this sequentially using an `await` within a `for...of` loop creates an unnecessary network waterfall and delays initial map rendering.
+**Action:** When making multiple independent API calls (like fetching metadata for different years/tilesets), always use `Promise.all` to fetch them in parallel instead of using sequential `await` calls.

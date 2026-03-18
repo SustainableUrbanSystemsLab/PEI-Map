@@ -306,7 +306,9 @@ resetViewBtn?.addEventListener('click', () => {
 
 // ════════════════════════ SOURCE LAYER DETECTION ════════════════════════
 async function detectSourceLayers() {
-    for (const [yr, ts] of Object.entries(TS)) {
+    // ⚡ Bolt: Fetch Mapbox tileset metadata in parallel instead of sequentially
+    // Reduces initial map render time by eliminating network waterfall
+    const fetchPromises = Object.entries(TS).map(async ([yr, ts]) => {
         try {
             const r = await fetch(`https://api.mapbox.com/v4/${ts.id}.json?access_token=${mapboxgl.accessToken}`);
             if (!r.ok) throw new Error(`Metadata request failed (${r.status})`);
@@ -315,7 +317,8 @@ async function detectSourceLayers() {
             if (layers.length > 0) { ts.sl = layers[0].id; console.log(`✅ ${yr} → "${ts.sl}"`); }
             else console.warn(`❌ ${yr}: no vector_layers`, meta);
         } catch (e) { console.error(`❌ ${yr}:`, e); }
-    }
+    });
+    await Promise.all(fetchPromises);
 }
 
 // ════════════════════════ MAIN MAP ════════════════════════
