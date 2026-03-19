@@ -591,15 +591,25 @@ function updateStats() {
         let min = Infinity;
         let max = -Infinity;
 
+        // ⚡ Bolt: Use a Set to track unique IDs (GEOID) to avoid duplicate arithmetic operations
+        // and artificially skewed stats when a single feature crosses Mapbox vector tile boundaries
+        const seen = new Set();
+
         // ⚡ Bolt: Single pass O(n) loop to calculate stats without intermediate arrays
         // Avoids "Maximum call stack size exceeded" on Math.min(...vals) with large feature counts
         for (let i = 0; i < feats.length; i++) {
-            const val = +feats[i].properties[col];
-            if (!isNaN(val)) {
-                count++;
-                sum += val;
-                if (val < min) min = val;
-                if (val > max) max = val;
+            const feat = feats[i];
+            const geoid = feat.properties.GEOID;
+
+            if (geoid && !seen.has(geoid)) {
+                seen.add(geoid);
+                const val = +feat.properties[col];
+                if (!isNaN(val)) {
+                    count++;
+                    sum += val;
+                    if (val < min) min = val;
+                    if (val > max) max = val;
+                }
             }
         }
 
