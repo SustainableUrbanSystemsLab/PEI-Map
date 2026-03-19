@@ -9,3 +9,8 @@
 ## 2025-03-18 - Semantic Grouping and ARIA Pressed States for Custom Toggle Buttons
 **Learning:** Custom UI button groups (like View Mode, Year selection, or Map Theme) that act as radio buttons but use simple `<div>` layouts and `class="on"` state toggling are inaccessible to screen readers without ARIA context. Users cannot discern that the buttons are related or currently active.
 **Action:** When creating custom grouped toggle buttons or segmented controls, wrap them in an element with `role="group"` and `aria-labelledby`, and ensure the active/inactive states are communicated to screen readers dynamically via `aria-pressed="true"`/`aria-pressed="false"`.
+
+
+## 2024-05-18 - Keyboard Shortcuts for Mapbox Geocoder Input
+**Learning:** Mapbox geocoder inputs are often difficult to navigate to quickly without a mouse. Adding a global keyboard shortcut (like `/`) significantly improves the experience for power users, but care must be taken to avoid triggering the shortcut when the user is already typing in an input field.
+**Action:** When adding global keyboard shortcuts to focus specific elements, always check `e.target.tagName` to ensure the user is not currently focused on an `INPUT` or `TEXTAREA` to prevent overriding normal typing behavior.

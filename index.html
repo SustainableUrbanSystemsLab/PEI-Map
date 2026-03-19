@@ -30,7 +30,7 @@
     <div id="sb">
         <div class="sbh">
             <button id="sb-close" type="button" aria-label="Close controls">Close</button>
-            <h1>🗺&nbsp; PEI Dashboard</h1>
+            <h1><span aria-hidden="true">🗺</span>&nbsp; PEI Dashboard</h1>
             <p>Pedestrian Environment Index · Nationwide</p>
         </div>
 
@@ -42,8 +42,8 @@
                 <button class="btn" id="m-diff" aria-pressed="false" onclick="setMode('diff')">PEI Diff</button>
             </div>
             <div class="br" style="margin-top:4px">
-                <button class="btn" id="m-pswipe" aria-pressed="false" onclick="setMode('pswipe')">⇔ PEI Swipe</button>
-                <button class="btn" id="m-yswipe" aria-pressed="false" onclick="setMode('yswipe')">⇔ Year Swipe</button>
+                <button class="btn" id="m-pswipe" aria-pressed="false" onclick="setMode('pswipe')"><span aria-hidden="true">⇔</span> PEI Swipe</button>
+                <button class="btn" id="m-yswipe" aria-pressed="false" onclick="setMode('yswipe')"><span aria-hidden="true">⇔</span> Year Swipe</button>
             </div>
         </div>
 
@@ -86,7 +86,7 @@
                 <option value="orig-new">Original − New</option>
                 <option value="orig-comb">Original − Combined</option>
             </select>
-            <p class="hint">🟢 Green = new indices improve score<br>🔴 Red = new indices reduce score</p>
+            <p class="hint"><span aria-hidden="true">🟢</span> Green = new indices improve score<br><span aria-hidden="true">🔴</span> Red = new indices reduce score</p>
         </div>
 
         <!-- PEI SWIPE controls -->
