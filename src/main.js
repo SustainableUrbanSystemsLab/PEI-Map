@@ -297,7 +297,16 @@ sidebarEl?.addEventListener('change', (e) => {
     if (mobileMq.matches && target instanceof Element && target.tagName === 'SELECT') setSidebarOpen(false);
 });
 window.addEventListener('resize', () => { if (!mobileMq.matches) setSidebarOpen(false); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setSidebarOpen(false); });
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setSidebarOpen(false);
+    if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        const searchInput = document.querySelector('.mapboxgl-ctrl-geocoder--input');
+        if (searchInput) {
+            searchInput.focus();
+        }
+    }
+});
 resetViewBtn?.addEventListener('click', () => {
     map.easeTo({ center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, duration: 900 });
     popup.remove();
@@ -326,15 +335,13 @@ const map = new mapboxgl.Map({ container: 'map', style: BASES[base], center: DEF
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
 // Add Geocoder
-map.addControl(
-    new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl,
-        marker: false,
-        placeholder: 'Search address or place...'
-    }),
-    'top-left'
-);
+const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
+    marker: false,
+    placeholder: 'Search address or place... (Press /)'
+});
+map.addControl(geocoder, 'top-left');
 
 // Add Scale Control
 map.addControl(new mapboxgl.ScaleControl({ maxWidth: 200, unit: 'imperial' }), 'bottom-left');
