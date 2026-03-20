@@ -81,18 +81,43 @@ function resetStats(message = 'Current viewport') {
     document.getElementById('s-max').textContent = '-';
 }
 
+// ⚡ Bolt: Cache normalized keys for Mapbox feature properties using WeakMap
+// Prevents expensive O(N*M) string allocation and regex executions when querying the same object repeatedly.
+const normalizedPropsCache = new WeakMap();
+
 function getPropValue(props, keys) {
-    if (!props) return null;
-    const entries = Object.entries(props);
+    if (!props || typeof props !== 'object') return null;
+
+    let normalizedKeys = null;
+
     for (const key of keys) {
-        if (props[key] != null && `${props[key]}`.trim() !== '') return `${props[key]}`.trim();
-        const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const match = entries.find(([propKey, propValue]) => (
-            propValue != null &&
-            `${propValue}`.trim() !== '' &&
-            propKey.toLowerCase().replace(/[^a-z0-9]/g, '') === normalizedKey
-        ));
-        if (match) return `${match[1]}`.trim();
+        // Fast path: try exact match first for this specific key
+        const val = props[key];
+        if (val != null && `${val}`.trim() !== '') return `${val}`.trim();
+
+        // Slow path: normalized matching
+        if (!normalizedKeys) {
+            normalizedKeys = normalizedPropsCache.get(props);
+            if (!normalizedKeys) {
+                normalizedKeys = [];
+                for (const [propKey, propValue] of Object.entries(props)) {
+                    if (propValue != null && `${propValue}`.trim() !== '') {
+                        normalizedKeys.push([
+                            propKey.toLowerCase().replace(/[^a-z0-9]/g, ''),
+                            `${propValue}`.trim()
+                        ]);
+                    }
+                }
+                normalizedPropsCache.set(props, normalizedKeys);
+            }
+        }
+
+        const targetKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+        for (let i = 0; i < normalizedKeys.length; i++) {
+            if (normalizedKeys[i][0] === targetKey) {
+                return normalizedKeys[i][1];
+            }
+        }
     }
     return null;
 }

@@ -4,3 +4,6 @@
 ## 2024-05-19 - Mapbox Vector Tile Boundaries cause Feature Duplication
 **Learning:** The Mapbox `queryRenderedFeatures` method returns duplicate features when a single geographic entity crosses vector tile boundaries. Aggregating these un-deduplicated arrays leads to redundant calculation cycles and artificially skews counts, sums, and averages.
 **Action:** When calculating statistics or performing heavy aggregations on the output of `queryRenderedFeatures`, always use a `Set` and a unique identifier (like `GEOID`) to track and deduplicate features in a single pass before performing any calculations.
+## 2024-05-20 - Redundant String Normalization in Loops
+**Learning:** In `getPropValue`, iterating over properties and keys involves repeatedly calling `toLowerCase().replace(/[^a-z0-9]/g, '')` on the same strings. This O(N*M) string allocation and regex execution is extremely inefficient, especially when called repeatedly per Mapbox feature during interaction or processing.
+**Action:** When performing flexible or fuzzy key matching against a large set of objects or frequently called functions, use a `WeakMap` to cache the normalized keys (e.g., stripping non-alphanumeric characters) for each object. This avoids repeated expensive regex and string operations across multiple queries for the same object.
