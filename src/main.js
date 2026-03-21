@@ -304,6 +304,9 @@ setThemeMode(themeMode);
 
 function setSidebarOpen(open) {
     bodyEl.classList.toggle('sb-open', !!open);
+    if (sidebarToggleBtn) {
+        sidebarToggleBtn.setAttribute('aria-expanded', !!open);
+    }
 }
 
 function closeSidebarIfMobile() {
