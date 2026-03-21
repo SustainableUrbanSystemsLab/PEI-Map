@@ -191,7 +191,7 @@
             <label class="lbl" for="opa">Layer Opacity</label>
             <div class="srow">
                 <input type="range" id="opa" min="0" max="100" value="80" oninput="setOpacity(this.value)">
-                <span class="sv" id="opa-v">80%</span>
+                <output for="opa" class="sv" id="opa-v">80%</output>
             </div>
         </div>
     </div>
@@ -199,9 +199,9 @@
 
     <!-- MAP -->
     <div id="mw">
-        <button id="sb-toggle" type="button" aria-label="Open controls">Controls</button>
+        <button id="sb-toggle" type="button" aria-label="Open controls" aria-controls="sb" aria-expanded="false">Controls</button>
         <button id="reset-view" type="button" aria-label="Reset map view">Reset View</button>
-        <div id="ld">
+        <div id="ld" role="status" aria-live="polite">
             <div class="spin"></div>
             <p>Loading PEI tileset data…</p>
         </div>
