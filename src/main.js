@@ -418,18 +418,26 @@ function addLayers(m, yr) {
     const ts = TS[yr];
     if (!ts.sl) return;
     ['tracts-fill', 'tracts-line', 'tracts-hover'].forEach(id => { if (m.getLayer(id)) m.removeLayer(id); });
-    if (m.getSource('src')) m.removeSource('src');
-    m.addSource('src', { type: 'vector', url: ts.url });
+
+    // ⚡ Bolt: Reuse existing source-layer to prevent duplicate network requests
+    // Background layers src-2013, src-2017, src-2022 are preloaded. Reusing them
+    // instead of creating a new 'src' source avoids redundant tile parsing and fetching.
+    const sourceId = m.getSource(`src-${yr}`) ? `src-${yr}` : 'src';
+    if (sourceId === 'src') {
+         if (m.getSource('src')) m.removeSource('src');
+         m.addSource('src', { type: 'vector', url: ts.url });
+    }
+
     m.addLayer({
-        id: 'tracts-fill', type: 'fill', source: 'src', 'source-layer': ts.sl,
+        id: 'tracts-fill', type: 'fill', source: sourceId, 'source-layer': ts.sl,
         paint: { 'fill-color': peiExpr('PEI_original'), 'fill-opacity': opacity }
     });
     m.addLayer({
-        id: 'tracts-line', type: 'line', source: 'src', 'source-layer': ts.sl,
+        id: 'tracts-line', type: 'line', source: sourceId, 'source-layer': ts.sl,
         paint: { 'line-color': '#000', 'line-opacity': 0.07, 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0, 8, 0.5] }
     });
     m.addLayer({
-        id: 'tracts-hover', type: 'line', source: 'src', 'source-layer': ts.sl,
+        id: 'tracts-hover', type: 'line', source: sourceId, 'source-layer': ts.sl,
         paint: { 'line-color': '#000', 'line-width': 2, 'line-opacity': 1 },
         filter: ['==', 'GEOID', '']
     });
