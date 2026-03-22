@@ -17,12 +17,17 @@
             }
         })();
     </script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <!-- ⚡ Bolt: Preconnect to Mapbox API to accelerate TLS handshakes for tiles and metadata -->
+    <link rel="preconnect" href="https://api.mapbox.com">
+    <link rel="dns-prefetch" href="https://api.mapbox.com">
+
+    <!-- ⚡ Bolt: Defer large Mapbox scripts to prevent blocking HTML parsing and First Contentful Paint -->
+    <script defer src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+    <script defer src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css"
         rel="stylesheet" />
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <script defer src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css" />
 </head>
 
