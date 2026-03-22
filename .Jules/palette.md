@@ -11,6 +11,14 @@
 **Action:** When creating custom grouped toggle buttons or segmented controls, wrap them in an element with `role="group"` and `aria-labelledby`, and ensure the active/inactive states are communicated to screen readers dynamically via `aria-pressed="true"`/`aria-pressed="false"`.
 
 
+## 2025-10-24 - Contextual Escape Key Behaviors in Map Interfaces
+**Learning:** Having a global `Escape` key handler that blindly closes the main map sidebar is frustrating for users when they simply want to dismiss a secondary element like a Mapbox popup. The user intent of "Escape" depends on what is currently active.
+**Action:** When implementing global `Escape` keydown handlers, always check for active secondary overlays (like map popups, modals, or focused inputs) and close/dismiss those first, before falling back to closing primary app-level navigation (like sidebars).
+
+## 2025-10-24 - Shifting Focus for Off-Canvas Navigation on Mobile
+**Learning:** When mobile sidebars slide over the content but do not trap or shift focus, screen reader and keyboard users are left navigating the underlying hidden page rather than the new sidebar content.
+**Action:** When an off-canvas menu or sidebar opens, always explicitly shift `.focus()` to its first actionable element (like a close button). When it closes, shift focus back to the trigger button that opened it.
+
 ## 2024-05-18 - Keyboard Shortcuts for Mapbox Geocoder Input
 **Learning:** Mapbox geocoder inputs are often difficult to navigate to quickly without a mouse. Adding a global keyboard shortcut (like `/`) significantly improves the experience for power users, but care must be taken to avoid triggering the shortcut when the user is already typing in an input field.
 **Action:** When adding global keyboard shortcuts to focus specific elements, always check `e.target.tagName` to ensure the user is not currently focused on an `INPUT` or `TEXTAREA` to prevent overriding normal typing behavior.
