@@ -182,6 +182,7 @@ input[type='range']:focus-visible,
 #sb-toggle:focus-visible,
 #sb-close:focus-visible,
 #reset-view:focus-visible,
+.ptab:focus-visible,
 .mapboxgl-popup-close-button:focus-visible {
     outline: 2px solid var(--acc);
     outline-offset: 2px
@@ -261,7 +262,13 @@ input[type=range]::-webkit-slider-thumb:hover {
     font-size: 11px;
     font-weight: 600;
     font-family: inherit;
-    cursor: pointer
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+#sb-toggle:hover,
+#sb-close:hover {
+    background: var(--geocoder-hover);
 }
 
 #reset-view {
@@ -277,7 +284,12 @@ input[type=range]::-webkit-slider-thumb:hover {
     font-size: 11px;
     font-weight: 600;
     font-family: inherit;
-    cursor: pointer
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+#reset-view:hover {
+    background: var(--geocoder-hover);
 }
 
 #sb-toggle {

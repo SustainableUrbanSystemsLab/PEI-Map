@@ -194,7 +194,7 @@ function buildPopupHtml(state, activeYear) {
     <div class="ploc">${state.countyName}, ${state.stateName}</div>
   </div>
   <div class="pb">
-    <div class="ptabs">${yearTabs}</div>
+    <div class="ptabs" role="group" aria-label="Timeline Year">${yearTabs}</div>
     <div class="pst">PEI Scores — ${selectedYear}</div>
     ${bar('PEI Original', p.PEI_original)}
     ${bar('PEI New', p.PEI_new)}
@@ -307,6 +307,17 @@ function setSidebarOpen(open) {
     if (sidebarToggleBtn) {
         sidebarToggleBtn.setAttribute('aria-expanded', !!open);
     }
+    if (mobileMq.matches) {
+        if (open && sidebarCloseBtn) {
+            setTimeout(() => {
+                sidebarCloseBtn.focus();
+            }, 300); // Wait for transition to finish
+        } else if (!open && sidebarToggleBtn) {
+            setTimeout(() => {
+                sidebarToggleBtn.focus();
+            }, 300); // Wait for transition to finish
+        }
+    }
 }
 
 function closeSidebarIfMobile() {
@@ -326,7 +337,16 @@ sidebarEl?.addEventListener('change', (e) => {
 });
 window.addEventListener('resize', () => { if (!mobileMq.matches) setSidebarOpen(false); });
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') setSidebarOpen(false);
+    if (e.key === 'Escape') {
+        if (popup.isOpen()) {
+            popup.remove();
+            if (map.getLayer('tracts-hover')) {
+                map.setFilter('tracts-hover', ['==', 'GEOID', '']);
+            }
+        } else {
+            setSidebarOpen(false);
+        }
+    }
     if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         e.preventDefault();
         const searchInput = document.querySelector('.mapboxgl-ctrl-geocoder--input');
