@@ -338,6 +338,10 @@ sidebarEl?.addEventListener('change', (e) => {
 window.addEventListener('resize', () => { if (!mobileMq.matches) setSidebarOpen(false); });
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            e.target.blur();
+            return;
+        }
         if (popup.isOpen()) {
             popup.remove();
             if (map.getLayer('tracts-hover')) {
