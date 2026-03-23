@@ -21,6 +21,11 @@
     <link rel="preconnect" href="https://api.mapbox.com">
     <link rel="dns-prefetch" href="https://api.mapbox.com">
 
+    <!-- ⚡ Bolt: Use direct `<link>` tags for Google Fonts instead of `@import` in CSS to prevent network waterfalls -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- ⚡ Bolt: Defer large Mapbox scripts to prevent blocking HTML parsing and First Contentful Paint -->
     <script defer src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />

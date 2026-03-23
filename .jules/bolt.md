@@ -11,3 +11,7 @@
 ## 2024-05-18 - Prevent Mapbox duplicate vector tile loads
 **Learning:** Mapbox GL JS treats identical source URLs as distinct if they are registered under different source IDs. Destroying and recreating a layer's source instead of pointing to a preloaded identical background source causes redundant network requests, parsing overhead, and flashing UI when toggling layers.
 **Action:** When working with Mapbox layers that toggle visibility, load the source once on map initialization and point multiple layers to the same source ID, instead of dynamically recreating `addSource` over time.
+
+## 2024-05-21 - CSS @import Causes Network Waterfalls
+**Learning:** Using `@import` in CSS files (e.g., to load Google Fonts) forces the browser to wait until the CSS file is downloaded and parsed before it can discover and start downloading the imported resources. This sequential fetching creates a network waterfall and delays First Contentful Paint (FCP).
+**Action:** Always load critical external resources like fonts directly in the HTML `<head>` using `<link rel="stylesheet">` and `<link rel="preconnect">` to enable parallel fetching alongside other primary assets.
