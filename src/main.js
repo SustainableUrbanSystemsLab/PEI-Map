@@ -99,13 +99,10 @@ function getPropValue(props, keys) {
         if (!normalizedKeys) {
             normalizedKeys = normalizedPropsCache.get(props);
             if (!normalizedKeys) {
-                normalizedKeys = [];
+                normalizedKeys = Object.create(null); // ⚡ Bolt: Use prototype-less Hash Map for safe O(1) lookup
                 for (const [propKey, propValue] of Object.entries(props)) {
                     if (propValue != null && `${propValue}`.trim() !== '') {
-                        normalizedKeys.push([
-                            propKey.toLowerCase().replace(/[^a-z0-9]/g, ''),
-                            `${propValue}`.trim()
-                        ]);
+                        normalizedKeys[propKey.toLowerCase().replace(/[^a-z0-9]/g, '')] = `${propValue}`.trim();
                     }
                 }
                 normalizedPropsCache.set(props, normalizedKeys);
@@ -113,10 +110,9 @@ function getPropValue(props, keys) {
         }
 
         const targetKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-        for (let i = 0; i < normalizedKeys.length; i++) {
-            if (normalizedKeys[i][0] === targetKey) {
-                return normalizedKeys[i][1];
-            }
+        // ⚡ Bolt: O(1) Hash Map lookup instead of O(N) array iteration
+        if (normalizedKeys[targetKey] !== undefined) {
+            return normalizedKeys[targetKey];
         }
     }
     return null;

@@ -15,3 +15,7 @@
 ## 2024-05-21 - CSS @import Causes Network Waterfalls
 **Learning:** Using `@import` in CSS files (e.g., to load Google Fonts) forces the browser to wait until the CSS file is downloaded and parsed before it can discover and start downloading the imported resources. This sequential fetching creates a network waterfall and delays First Contentful Paint (FCP).
 **Action:** Always load critical external resources like fonts directly in the HTML `<head>` using `<link rel="stylesheet">` and `<link rel="preconnect">` to enable parallel fetching alongside other primary assets.
+
+## 2024-05-22 - Array vs Hash Map for Cached Data Lookups
+**Learning:** When caching normalized property lists, storing them as an array of pairs and scanning them iteratively creates a hidden O(M*N) performance bottleneck inside a tight loop.
+**Action:** Always store cached key-value mappings as Objects (Hash Maps) or Maps to enable O(1) lookups and completely eliminate nested loop iterations.
