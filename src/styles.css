@@ -181,9 +181,15 @@ input[type='range']:focus-visible,
 #sb-close:focus-visible,
 #reset-view:focus-visible,
 .ptab:focus-visible,
-.mapboxgl-popup-close-button:focus-visible {
+.mapboxgl-popup-close-button:focus-visible,
+.mapboxgl-ctrl-group button:focus-visible {
     outline: 2px solid var(--acc);
     outline-offset: 2px
+}
+
+/* Mapbox GL JS sets overflow: hidden on .mapboxgl-ctrl-group which clips outline-offset: 2px */
+.mapboxgl-ctrl-group button:focus-visible {
+    outline-offset: -2px;
 }
 
 select {
