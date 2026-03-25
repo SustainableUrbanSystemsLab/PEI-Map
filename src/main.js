@@ -84,6 +84,7 @@ function resetStats(message = 'Current viewport') {
 // ⚡ Bolt: Cache normalized keys for Mapbox feature properties using WeakMap
 // Prevents expensive O(N*M) string allocation and regex executions when querying the same object repeatedly.
 const normalizedPropsCache = new WeakMap();
+const searchKeyCache = new Map();
 
 function getPropValue(props, keys) {
     if (!props || typeof props !== 'object') return null;
@@ -109,7 +110,13 @@ function getPropValue(props, keys) {
             }
         }
 
-        const targetKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+        // ⚡ Bolt: Cache normalized search keys to prevent repeated O(N) string/regex operations on the same keys
+        let targetKey = searchKeyCache.get(key);
+        if (!targetKey) {
+            targetKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+            searchKeyCache.set(key, targetKey);
+        }
+
         // ⚡ Bolt: O(1) Hash Map lookup instead of O(N) array iteration
         if (normalizedKeys[targetKey] !== undefined) {
             return normalizedKeys[targetKey];
