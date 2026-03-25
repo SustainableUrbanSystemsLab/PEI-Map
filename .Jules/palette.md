@@ -22,3 +22,11 @@
 ## 2024-05-18 - Keyboard Shortcuts for Mapbox Geocoder Input
 **Learning:** Mapbox geocoder inputs are often difficult to navigate to quickly without a mouse. Adding a global keyboard shortcut (like `/`) significantly improves the experience for power users, but care must be taken to avoid triggering the shortcut when the user is already typing in an input field.
 **Action:** When adding global keyboard shortcuts to focus specific elements, always check `e.target.tagName` to ensure the user is not currently focused on an `INPUT` or `TEXTAREA` to prevent overriding normal typing behavior.
+
+## 2024-11-20 - Isolating Off-Canvas Navigation with `inert`
+**Learning:** Shifting focus to a mobile sidebar is a great start, but screen readers can still explore the visually hidden page behind the backdrop, causing severe disorientation for users who tab past the end of the sidebar.
+**Action:** Use the HTML `inert` attribute on the main app wrapper when an off-canvas menu opens to completely remove the background content from the accessibility tree and trap focus naturally without complex JavaScript focus trapping.
+
+## 2024-11-20 - Associating Contextual Hints with Form Controls
+**Learning:** Paragraphs of instructional text (`<p class="hint">`) placed directly below a select dropdown or button group are obvious to sighted users, but screen readers will not announce them when the control receives focus, leaving users without crucial context (like what colors represent in a diff view).
+**Action:** Always assign an `id` to hint text and use `aria-describedby="hintId"` on the corresponding `<select>`, `<input>`, or `role="group"` so the instructions are announced automatically upon focus.
