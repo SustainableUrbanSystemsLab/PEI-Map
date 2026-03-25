@@ -92,11 +92,11 @@
         <!-- PEI DIFF controls -->
         <div class="sec" id="ctl-diff" style="display:none">
             <label class="lbl" for="diff-sel">Compare</label>
-            <select id="diff-sel" onchange="updateLayer()">
+            <select id="diff-sel" onchange="updateLayer()" aria-describedby="diff-hint">
                 <option value="orig-new">Original − New</option>
                 <option value="orig-comb">Original − Combined</option>
             </select>
-            <p class="hint"><span aria-hidden="true">🟢</span> Green = new indices improve score<br><span aria-hidden="true">🔴</span> Red = new indices reduce score</p>
+            <p class="hint" id="diff-hint"><span aria-hidden="true">🟢</span> Green = new indices improve score<br><span aria-hidden="true">🔴</span> Red = new indices reduce score</p>
         </div>
 
         <!-- PEI SWIPE controls -->
@@ -182,7 +182,7 @@
         </div>
 
         <!-- BASEMAP -->
-        <div class="sec" role="group" aria-labelledby="lbl-theme">
+        <div class="sec" role="group" aria-labelledby="lbl-theme" aria-describedby="theme-hint">
             <div class="lbl" id="lbl-theme">Theme + Basemap</div>
             <div class="br">
                 <button class="btn" id="b-auto" aria-pressed="false" onclick="setMapTheme('auto')">Auto</button>
@@ -193,7 +193,7 @@
                 <button class="btn" id="b-satellite" aria-pressed="false" onclick="setBase('satellite')">Sat</button>
                 <button class="btn" id="b-streets" aria-pressed="false" onclick="setBase('streets')">Streets</button>
             </div>
-            <p class="hint">Auto, Light, and Dark sync the app theme and basemap together.</p>
+            <p class="hint" id="theme-hint">Auto, Light, and Dark sync the app theme and basemap together.</p>
         </div>
 
         <!-- OPACITY -->

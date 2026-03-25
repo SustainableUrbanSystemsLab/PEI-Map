@@ -303,6 +303,14 @@ function setSidebarOpen(open) {
     if (sidebarToggleBtn) {
         sidebarToggleBtn.setAttribute('aria-expanded', !!open);
     }
+    const mw = document.getElementById('mw');
+    if (mw) {
+        if (open && mobileMq.matches) {
+            mw.setAttribute('inert', '');
+        } else {
+            mw.removeAttribute('inert');
+        }
+    }
     if (mobileMq.matches) {
         if (open && sidebarCloseBtn) {
             setTimeout(() => {
