@@ -102,13 +102,13 @@
         <!-- PEI SWIPE controls -->
         <div class="sec" id="ctl-pswipe" style="display:none">
             <div class="lbl" id="lbl-pswipe-year">Year</div>
-            <div class="br" id="ps-yr-btns" role="group" aria-labelledby="lbl-pswipe-year">
+            <div class="br" id="ps-yr-btns" role="group" aria-labelledby="lbl-pswipe-year" aria-describedby="pswipe-hint">
                 <button class="btn on" id="ps-2013" aria-pressed="true" onclick="setPSwipeYear('2013')">2013</button>
                 <button class="btn" id="ps-2017" aria-pressed="false" onclick="setPSwipeYear('2017')">2017</button>
                 <button class="btn" id="ps-2022" aria-pressed="false" onclick="setPSwipeYear('2022')">2022</button>
             </div>
             <label class="sub-lbl" for="left-pei">Left Map</label>
-            <select id="left-pei" onchange="updateSplit()">
+            <select id="left-pei" onchange="updateSplit()" aria-describedby="pswipe-hint">
                 <option value="PEI_original">PEI Original</option>
                 <option value="PEI_new">PEI New</option>
                 <option value="PEI_combined">PEI Combined</option>
@@ -126,7 +126,7 @@
                 </optgroup>
             </select>
             <label class="sub-lbl" for="right-pei">Right Map</label>
-            <select id="right-pei" onchange="updateSplit()">
+            <select id="right-pei" onchange="updateSplit()" aria-describedby="pswipe-hint">
                 <option value="PEI_new">PEI New</option>
                 <option value="PEI_original">PEI Original</option>
                 <option value="PEI_combined">PEI Combined</option>
@@ -143,12 +143,13 @@
                     <option value="PTAL">PTAL</option>
                 </optgroup>
             </select>
+            <p class="hint" id="pswipe-hint" style="margin-top:6px">Drag the divider to compare maps side by side at the same location.</p>
         </div>
 
         <!-- YEAR SWIPE controls -->
         <div class="sec" id="ctl-yswipe" style="display:none">
             <label class="lbl" for="yswipe-pei">Layer Display</label>
-            <select id="yswipe-pei" onchange="updateSplit()">
+            <select id="yswipe-pei" onchange="updateSplit()" aria-describedby="yswipe-hint">
                 <option value="PEI_original">PEI Original</option>
                 <option value="PEI_new">PEI New</option>
                 <option value="PEI_combined">PEI Combined</option>
@@ -166,19 +167,18 @@
                 </optgroup>
             </select>
             <label class="sub-lbl" for="left-yr">Left Year</label>
-            <select id="left-yr" onchange="updateSplit()">
+            <select id="left-yr" onchange="updateSplit()" aria-describedby="yswipe-hint">
                 <option value="2013">2013</option>
                 <option value="2017">2017</option>
                 <option value="2022">2022</option>
             </select>
             <label class="sub-lbl" for="right-yr">Right Year</label>
-            <select id="right-yr" onchange="updateSplit()">
+            <select id="right-yr" onchange="updateSplit()" aria-describedby="yswipe-hint">
                 <option value="2022">2022</option>
                 <option value="2017">2017</option>
                 <option value="2013">2013</option>
             </select>
-            <p class="hint" style="margin-top:6px">Drag the divider to compare years side by side at the same location.
-            </p>
+            <p class="hint" id="yswipe-hint" style="margin-top:6px">Drag the divider to compare years side by side at the same location.</p>
         </div>
 
         <!-- BASEMAP -->
