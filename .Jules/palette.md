@@ -30,3 +30,7 @@
 ## 2024-11-20 - Associating Contextual Hints with Form Controls
 **Learning:** Paragraphs of instructional text (`<p class="hint">`) placed directly below a select dropdown or button group are obvious to sighted users, but screen readers will not announce them when the control receives focus, leaving users without crucial context (like what colors represent in a diff view).
 **Action:** Always assign an `id` to hint text and use `aria-describedby="hintId"` on the corresponding `<select>`, `<input>`, or `role="group"` so the instructions are announced automatically upon focus.
+
+## 2026-03-27 - HTML5 Semantic Landmarks in Map Dashboards
+**Learning:** Full-screen web map dashboards often lack traditional document flow, replacing headers and footers with floating widgets and sidebars. Without semantic landmarks (`<aside>`, `<main>`) and ARIA roles (`role="region"`), screen reader users are forced to traverse the entire DOM linearly without the ability to jump to functional areas (like map controls or stats).
+**Action:** When building map dashboards, add semantic landmarks to distinct functional areas to help screen reader users. If changing existing `<div>` tags to HTML5 landmarks (`<aside>`, `<main>`) breaks existing CSS layouts (e.g., tag-based child selectors like `body > div`), achieve the same accessibility benefit safely by adding `role="complementary"` and `role="main"` directly to the existing `<div>` wrappers. Also apply `role="region"` with `aria-labelledby` to floating informational widgets.
