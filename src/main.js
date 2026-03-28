@@ -209,14 +209,14 @@ function buildPopupHtml(state, activeYear) {
     </table>
     <div class="pst">Indices (${selectedYear}, Normalized)</div>
     <div class="pgr">
-      <div class="pr"><span class="pk">CDI</span><span class="pv">${f(p.CDI)}</span></div>
-      <div class="pr"><span class="pk">IDI</span><span class="pv">${f(p.IDI)}</span></div>
-      <div class="pr"><span class="pk">LDI</span><span class="pv">${f(p.LDI)}</span></div>
-      <div class="pr"><span class="pk">PDI</span><span class="pv">${f(p.PDI)}</span></div>
-      <div class="pr"><span class="pk">RSI</span><span class="pv">${f(p.RSI)}</span></div>
-      <div class="pr"><span class="pk">GSI</span><span class="pv">${f(p.GSI)}</span></div>
-      <div class="pr"><span class="pk">BI</span><span class="pv">${f(p.BI)}</span></div>
-      <div class="pr"><span class="pk">PTAL</span><span class="pv">${f(p.PTAL)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="Commercial Density Index" style="text-decoration: underline dotted; cursor: help">CDI</abbr></span><span class="pv">${f(p.CDI)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="Intersection Density Index" style="text-decoration: underline dotted; cursor: help">IDI</abbr></span><span class="pv">${f(p.IDI)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="Land Use Diversity Index" style="text-decoration: underline dotted; cursor: help">LDI</abbr></span><span class="pv">${f(p.LDI)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="Population Density Index" style="text-decoration: underline dotted; cursor: help">PDI</abbr></span><span class="pv">${f(p.PDI)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="Road Safety Index" style="text-decoration: underline dotted; cursor: help">RSI</abbr></span><span class="pv">${f(p.RSI)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="Green Space Index" style="text-decoration: underline dotted; cursor: help">GSI</abbr></span><span class="pv">${f(p.GSI)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="Bike Infrastructure Index" style="text-decoration: underline dotted; cursor: help">BI</abbr></span><span class="pv">${f(p.BI)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="Public Transit Access Level" style="text-decoration: underline dotted; cursor: help">PTAL</abbr></span><span class="pv">${f(p.PTAL)}</span></div>
     </div>
     <div class="pst">Demographics</div>
     ${demographicsMissing ? '<div class="pd-note">Not available in the published Mapbox tilesets.</div>' : `
