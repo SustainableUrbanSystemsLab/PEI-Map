@@ -86,6 +86,11 @@ function resetStats(message = 'Current viewport') {
 const normalizedPropsCache = new WeakMap();
 const searchKeyCache = new Map();
 
+// ⚡ Bolt: Cache normalized property keys globally
+// Mapbox GL JS allocates new `properties` objects on query, causing WeakMap cache misses.
+// We globally cache the expensive regex string replacement for each unique property key.
+const propKeyCache = new Map();
+
 function getPropValue(props, keys) {
     if (!props || typeof props !== 'object') return null;
 
@@ -101,9 +106,15 @@ function getPropValue(props, keys) {
             normalizedKeys = normalizedPropsCache.get(props);
             if (!normalizedKeys) {
                 normalizedKeys = Object.create(null); // ⚡ Bolt: Use prototype-less Hash Map for safe O(1) lookup
-                for (const [propKey, propValue] of Object.entries(props)) {
+                for (const propKey in props) {
+                    const propValue = props[propKey];
                     if (propValue != null && `${propValue}`.trim() !== '') {
-                        normalizedKeys[propKey.toLowerCase().replace(/[^a-z0-9]/g, '')] = `${propValue}`.trim();
+                        let normalizedPropKey = propKeyCache.get(propKey);
+                        if (!normalizedPropKey) {
+                            normalizedPropKey = propKey.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            propKeyCache.set(propKey, normalizedPropKey);
+                        }
+                        normalizedKeys[normalizedPropKey] = `${propValue}`.trim();
                     }
                 }
                 normalizedPropsCache.set(props, normalizedKeys);
