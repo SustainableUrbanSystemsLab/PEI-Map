@@ -38,3 +38,7 @@
 ## 2026-03-29 - Semantic Acronyms and Hiding Visual Color Legends
 **Learning:** Map popups are often data-dense and rely on acronyms (like CDI, RSI) to save space, but screen readers will read these as literal letters or poorly attempt to pronounce them, confusing users. Additionally, pure visual continuous color gradients like heat map legends lack discrete value mappings when read aloud, making them confusing noise.
 **Action:** Wrap data-dense acronyms in `<abbr title="Full Name">` tags with `cursor: help` to provide native hover tooltips and screen reader expansions. Always hide continuous visual-only color gradient legends with `aria-hidden="true"` if the actual quantitative values are already accessible elsewhere (like via popup interaction).
+
+## 2024-03-29 - Missing Skip-to-Content Links in Map Dashboards
+**Learning:** Map applications often feature long sidebars filled with toggle buttons, dropdowns, and form controls before the actual map and search inputs appear in the DOM. This forces keyboard users to tediously tab through dozens of elements before they can interact with the primary map content.
+**Action:** Always include a visually hidden "Skip to map" or "Skip to content" link at the very beginning of the `<body>` that becomes visible on focus and jumps keyboard users directly to the main content area or search input.
