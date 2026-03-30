@@ -42,3 +42,11 @@
 ## 2024-03-29 - Missing Skip-to-Content Links in Map Dashboards
 **Learning:** Map applications often feature long sidebars filled with toggle buttons, dropdowns, and form controls before the actual map and search inputs appear in the DOM. This forces keyboard users to tediously tab through dozens of elements before they can interact with the primary map content.
 **Action:** Always include a visually hidden "Skip to map" or "Skip to content" link at the very beginning of the `<body>` that becomes visible on focus and jumps keyboard users directly to the main content area or search input.
+
+## 2026-03-30 - WCAG 2.5.3 (Label in Name) and Hover Tooltips
+**Learning:** Using `aria-label` attributes that do not match the visible text of a control violates WCAG 2.5.3 (Label in Name) and confuses voice control software (like Dragon). If you want to provide a descriptive hover tooltip, `aria-label` is not the correct mechanism.
+**Action:** When an element has adequate visible text, do not override its accessible name with a differing `aria-label`. Instead, use the native `title` attribute to provide a hover tooltip without compromising accessibility.
+
+## 2026-03-30 - Semantic Map Popup Data Tables
+**Learning:** Data tables rendered dynamically inside map popups (like time-series comparisons) are often built with simple `<tr>` and `<td>` tags, or empty `<th>` tags for visual alignment. This causes screen readers to read the data linearly without establishing column and row relationships, confusing the user.
+**Action:** Always apply explicit `scope="col"` and `scope="row"` attributes to `<th>` elements. Provide visually hidden (e.g., using `clip: rect(0 0 0 0)`) text labels for empty table corner headers so screen readers announce the column correctly.
