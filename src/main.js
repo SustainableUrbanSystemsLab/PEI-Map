@@ -188,7 +188,7 @@ function buildPopupHtml(state, activeYear) {
     const bar = (label, val) => {
         const num = +val || 0;
         const col = lerp3('#d73027', '#ffffbf', '#1a9850', num);
-        return `<div class="pbar-row"><div class="pbar-h"><span class="pk">${label}</span><span class="pv">${f(val)}</span></div><div class="pbar-bg"><div class="pbar-f" style="width:${(num * 100).toFixed(1)}%;background:${col}"></div></div></div>`;
+        return `<div class="pbar-row"><div class="pbar-h"><span class="pk">${label}</span><span class="pv">${f(val)}</span></div><div class="pbar-bg" aria-hidden="true"><div class="pbar-f" style="width:${(num * 100).toFixed(1)}%;background:${col}"></div></div></div>`;
     };
     let tlRows = '';
     yrs.forEach((yr) => {
@@ -198,7 +198,7 @@ function buildPopupHtml(state, activeYear) {
             const col = d ? lerp3('#d73027', '#ffffbf', '#1a9850', v || 0) : '#666';
             return `<td><span style="background:${col};color:#000;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600">${d && v != null ? v.toFixed(2) : '—'}</span></td>`;
         }).join('');
-        tlRows += `<tr><td class="tl-yr"><b>${yr}</b></td>${vals}</tr>`;
+        tlRows += `<tr><th scope="row" class="tl-yr"><b>${yr}</b></th>${vals}</tr>`;
     });
     const yearTabs = yrs.map((yr) => `<button class="ptab${yr === selectedYear ? ' on' : ''}" type="button" aria-pressed="${yr === selectedYear}" onclick="setPopupYear('${yr}')">${yr}</button>`).join('');
     const demographicsMissing = state.population == null && state.commercial == null && state.intersections == null && state.areaKm2 == null;
@@ -214,8 +214,8 @@ function buildPopupHtml(state, activeYear) {
     ${bar('PEI New', p.PEI_new)}
     ${bar('PEI Combined', p.PEI_combined)}
     <div class="pst" style="margin-top:10px">3-Year Timeline</div>
-    <table class="tl-table">
-      <thead><tr><th></th><th>Original</th><th>New</th><th>Combined</th></tr></thead>
+    <table class="tl-table" aria-label="3-Year Timeline">
+      <thead><tr><th scope="col"><span style="border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px;">Year</span></th><th scope="col">Original</th><th scope="col">New</th><th scope="col">Combined</th></tr></thead>
       <tbody>${tlRows}</tbody>
     </table>
     <div class="pst">Indices (${selectedYear}, Normalized)</div>
