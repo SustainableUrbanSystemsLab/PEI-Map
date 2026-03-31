@@ -380,6 +380,10 @@ document.addEventListener('keydown', (e) => {
             searchInput.focus();
         }
     }
+    if (e.key.toLowerCase() === 'r' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+        e.preventDefault();
+        resetViewBtn?.click();
+    }
 });
 resetViewBtn?.addEventListener('click', () => {
     map.easeTo({ center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, duration: 900 });
