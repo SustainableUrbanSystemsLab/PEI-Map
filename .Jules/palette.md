@@ -50,3 +50,7 @@
 ## 2026-03-30 - Semantic Map Popup Data Tables
 **Learning:** Data tables rendered dynamically inside map popups (like time-series comparisons) are often built with simple `<tr>` and `<td>` tags, or empty `<th>` tags for visual alignment. This causes screen readers to read the data linearly without establishing column and row relationships, confusing the user.
 **Action:** Always apply explicit `scope="col"` and `scope="row"` attributes to `<th>` elements. Provide visually hidden (e.g., using `clip: rect(0 0 0 0)`) text labels for empty table corner headers so screen readers announce the column correctly.
+
+## 2024-03-31 - Keyboard Shortcut Hints in Tooltips
+**Learning:** Adding global keyboard shortcuts (like `R` to Reset View) makes dashboards more pleasant, but we must update the `title` attributes of the corresponding buttons (e.g. `Reset View (Press R)`) so the shortcuts are discoverable by users.
+**Action:** When adding keyboard shortcuts for buttons, ensure you add the shortcut hint to the button's title tooltip for visibility.
