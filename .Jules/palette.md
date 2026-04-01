@@ -54,3 +54,7 @@
 ## 2024-03-31 - Keyboard Shortcut Hints in Tooltips
 **Learning:** Adding global keyboard shortcuts (like `R` to Reset View) makes dashboards more pleasant, but we must update the `title` attributes of the corresponding buttons (e.g. `Reset View (Press R)`) so the shortcuts are discoverable by users.
 **Action:** When adding keyboard shortcuts for buttons, ensure you add the shortcut hint to the button's title tooltip for visibility.
+
+## 2026-04-01 - Preventing Phantom Focus and Screen Reader Noise for Animated Overlays
+**Learning:** Using `opacity: 0` and `pointer-events: none` to hide full-screen overlays (like loading states or modal backdrops) successfully prevents mouse interactions, but the elements remain in the accessibility tree. This allows screen readers and keyboard users to accidentally "tab" into visually hidden elements, causing disorientation and phantom focus.
+**Action:** When animating the visibility of overlays, combine `opacity` transitions with `visibility: hidden` and a delayed CSS transition (`transition: visibility 0s linear [duration]`). This guarantees the element is cleanly removed from the accessibility tree without breaking its fade-out animation.
