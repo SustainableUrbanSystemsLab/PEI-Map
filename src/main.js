@@ -360,7 +360,7 @@ sidebarEl?.addEventListener('change', (e) => {
 window.addEventListener('resize', () => { if (!mobileMq.matches) setSidebarOpen(false); });
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
             e.target.blur();
             return;
         }
@@ -373,7 +373,7 @@ document.addEventListener('keydown', (e) => {
             setSidebarOpen(false);
         }
     }
-    if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
         e.preventDefault();
         const searchInput = document.querySelector('.mapboxgl-ctrl-geocoder--input');
         if (searchInput) {
