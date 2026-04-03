@@ -244,6 +244,10 @@ function setPopupYear(nextYear) {
     if (!popupState || !popup.isOpen()) return;
     popupState.activeYear = nextYear;
     popup.setHTML(buildPopupHtml(popupState, nextYear));
+    setTimeout(() => {
+        const activeTab = document.querySelector('.mapboxgl-popup-content .ptab.on');
+        if (activeTab) activeTab.focus();
+    }, 0);
 }
 
 function getSystemBase() {

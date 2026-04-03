@@ -58,3 +58,7 @@
 ## 2026-04-01 - Preventing Phantom Focus and Screen Reader Noise for Animated Overlays
 **Learning:** Using `opacity: 0` and `pointer-events: none` to hide full-screen overlays (like loading states or modal backdrops) successfully prevents mouse interactions, but the elements remain in the accessibility tree. This allows screen readers and keyboard users to accidentally "tab" into visually hidden elements, causing disorientation and phantom focus.
 **Action:** When animating the visibility of overlays, combine `opacity` transitions with `visibility: hidden` and a delayed CSS transition (`transition: visibility 0s linear [duration]`). This guarantees the element is cleanly removed from the accessibility tree without breaking its fade-out animation.
+
+## 2025-10-24 - Restoring Focus After Dynamic DOM Replacement
+**Learning:** When map popups update content by completely replacing their inner HTML via methods like Mapbox's `setHTML()`, any focused element inside the popup is destroyed. This silently resets focus to the document `<body>`, forcing keyboard users to tab all the way back through the entire page just to interact with the popup again.
+**Action:** When dynamically replacing interactive UI blocks, always track what the user interacted with, and use a `setTimeout(..., 0)` to explicitly call `.focus()` on the corresponding newly rendered element to maintain keyboard navigation flow.
