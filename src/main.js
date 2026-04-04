@@ -628,6 +628,40 @@ function initSplit() {
             addSplitLayerByYear(aMap, TS[ryr], pei, ryr, 'after-map');
         }
         cmpObj = new mapboxgl.Compare(bMap, aMap, '#cmp', {});
+
+        // 🎨 Palette: Mapbox Compare plugin lacks native accessibility. Patch it to behave like a slider.
+        const swiperHandle = document.querySelector('#cmp .compare-swiper-vertical');
+        if (swiperHandle) {
+            swiperHandle.setAttribute('tabindex', '0');
+            swiperHandle.setAttribute('role', 'slider');
+            swiperHandle.setAttribute('aria-valuemin', '0');
+            swiperHandle.setAttribute('aria-valuemax', '100');
+            swiperHandle.setAttribute('aria-valuenow', '50');
+            swiperHandle.setAttribute('aria-label', 'Map comparison slider. Use left and right arrow keys to adjust.');
+
+            swiperHandle.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    // Get current pixel position from plugin's state or compute based on style
+                    const cmpRect = document.getElementById('cmp').getBoundingClientRect();
+                    const currentPx = cmpObj.currentPosition;
+
+                    // Move by 5% of container width
+                    const stepPx = cmpRect.width * 0.05;
+                    let nextPx = e.key === 'ArrowLeft' ? currentPx - stepPx : currentPx + stepPx;
+
+                    // Clamp to container bounds
+                    nextPx = Math.max(0, Math.min(nextPx, cmpRect.width));
+
+                    // Update slider position
+                    cmpObj.setSlider(nextPx);
+
+                    // Update aria-valuenow for screen readers
+                    const percentage = Math.round((nextPx / cmpRect.width) * 100);
+                    swiperHandle.setAttribute('aria-valuenow', percentage);
+                }
+            });
+        }
     }
     bMap.on('load', () => { bl = true; tryInit(); });
     aMap.on('load', () => { al = true; tryInit(); });
