@@ -62,3 +62,7 @@
 ## 2025-10-24 - Restoring Focus After Dynamic DOM Replacement
 **Learning:** When map popups update content by completely replacing their inner HTML via methods like Mapbox's `setHTML()`, any focused element inside the popup is destroyed. This silently resets focus to the document `<body>`, forcing keyboard users to tab all the way back through the entire page just to interact with the popup again.
 **Action:** When dynamically replacing interactive UI blocks, always track what the user interacted with, and use a `setTimeout(..., 0)` to explicitly call `.focus()` on the corresponding newly rendered element to maintain keyboard navigation flow.
+
+## 2024-05-20 - Adding Accessibility to Third-Party Map Plugins
+**Learning:** Third-party slider plugins (like Mapbox GL Compare) often inject interactive handles without native keyboard support, ARIA roles, or focus styles.
+**Action:** Manually patch injected interactive handles with `tabindex="0"`, `role="slider"`, relevant ARIA attributes, explicit keydown handlers (e.g. for arrow keys), and custom `focus-visible` CSS rules to ensure accessibility.
