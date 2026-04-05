@@ -66,3 +66,7 @@
 ## 2024-05-20 - Adding Accessibility to Third-Party Map Plugins
 **Learning:** Third-party slider plugins (like Mapbox GL Compare) often inject interactive handles without native keyboard support, ARIA roles, or focus styles.
 **Action:** Manually patch injected interactive handles with `tabindex="0"`, `role="slider"`, relevant ARIA attributes, explicit keydown handlers (e.g. for arrow keys), and custom `focus-visible` CSS rules to ensure accessibility.
+
+## 2026-04-02 - Confirming Background Actions with Live Regions
+**Learning:** Actions that change the overall state or view of a dashboard (like resetting map zoom or triggering a keyboard shortcut to clear state) are obvious visually, but screen reader users receive no feedback that the background action succeeded.
+**Action:** When creating app-wide controls or shortcuts that change background state without shifting focus, always use a global hidden `aria-live="polite"` element and explicitly update its text (e.g. "Map view reset") to provide an audible confirmation.
