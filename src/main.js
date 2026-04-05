@@ -65,6 +65,13 @@ const sidebarBackdrop = document.getElementById('sb-backdrop');
 const resetViewBtn = document.getElementById('reset-view');
 const statsNoteEl = document.getElementById('stats-note');
 const THEME_STORAGE_KEY = 'pei-theme-mode';
+const a11yAnnouncerEl = document.getElementById('a11y-announcer');
+
+function announce(msg) {
+    if (a11yAnnouncerEl) {
+        a11yAnnouncerEl.textContent = msg;
+    }
+}
 
 function showLoaderMessage(message) {
     const loader = document.getElementById('ld');
@@ -215,7 +222,7 @@ function buildPopupHtml(state, activeYear) {
     ${bar('PEI Combined', p.PEI_combined)}
     <div class="pst" style="margin-top:10px">3-Year Timeline</div>
     <table class="tl-table" aria-label="3-Year Timeline">
-      <thead><tr><th scope="col"><span style="border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px;">Year</span></th><th scope="col">Original</th><th scope="col">New</th><th scope="col">Combined</th></tr></thead>
+      <thead><tr><th scope="col"><span class="sr-only">Year</span></th><th scope="col">Original</th><th scope="col">New</th><th scope="col">Combined</th></tr></thead>
       <tbody>${tlRows}</tbody>
     </table>
     <div class="pst">Indices (${selectedYear}, Normalized)</div>
@@ -393,6 +400,7 @@ resetViewBtn?.addEventListener('click', () => {
     map.easeTo({ center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, duration: 900 });
     popup.remove();
     if (map.getLayer('tracts-hover')) map.setFilter('tracts-hover', ['==', 'GEOID', '']);
+    announce('Map view reset');
 });
 
 // ════════════════════════ SOURCE LAYER DETECTION ════════════════════════
