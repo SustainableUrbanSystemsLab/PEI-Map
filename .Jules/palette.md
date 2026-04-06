@@ -70,3 +70,8 @@
 ## 2026-04-02 - Confirming Background Actions with Live Regions
 **Learning:** Actions that change the overall state or view of a dashboard (like resetting map zoom or triggering a keyboard shortcut to clear state) are obvious visually, but screen reader users receive no feedback that the background action succeeded.
 **Action:** When creating app-wide controls or shortcuts that change background state without shifting focus, always use a global hidden `aria-live="polite"` element and explicitly update its text (e.g. "Map view reset") to provide an audible confirmation.
+
+
+## 2024-04-06 - Audible Confirmations for State Toggles
+**Learning:** In map applications with sidebars, users frequently toggle modes, years, or basemaps using button groups. While visually obvious, screen reader users receive no confirmation that the map configuration in the main view actually changed.
+**Action:** Call an `announce()` function (which updates an `aria-live` region) whenever users toggle core application states like View Mode, Year, or Basemap to provide immediate audible feedback.

@@ -557,6 +557,7 @@ function setMode(m) {
     if (['pswipe', 'yswipe'].includes(m)) { teardownSplit(); initSplit(); }
     else { teardownSplit(); updateLayer(); }
     updateLegend();
+    announce(`View mode set to ${m}`);
 }
 
 // ════════════════════════ YEAR ════════════════════════
@@ -571,6 +572,7 @@ function setYear(yr) {
         }
     });
     addLayers(map, yr); updateLayer();
+    announce(`Year set to ${yr}`);
 }
 function setPSwipeYear(yr) {
     pSwipeYear = yr;
@@ -583,6 +585,7 @@ function setPSwipeYear(yr) {
         }
     });
     if (cmpObj) { teardownSplit(); initSplit(); }
+    announce(`Swipe year set to ${yr}`);
 }
 
 // ════════════════════════ BASEMAP ════════════════════════
@@ -596,6 +599,7 @@ function setBase(b, fromAuto = false) {
     const c = map.getCenter(), z = map.getZoom();
     map.once('style.load', () => { addLayers(map, year); addBackgroundLayers(map); map.setCenter(c); map.setZoom(z); });
     map.setStyle(BASES[b]);
+    announce(`Basemap set to ${b}`);
 }
 
 function setMapTheme(mode) {
