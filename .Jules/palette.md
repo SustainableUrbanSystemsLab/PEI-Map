@@ -75,3 +75,7 @@
 ## 2024-04-06 - Audible Confirmations for State Toggles
 **Learning:** In map applications with sidebars, users frequently toggle modes, years, or basemaps using button groups. While visually obvious, screen reader users receive no confirmation that the map configuration in the main view actually changed.
 **Action:** Call an `announce()` function (which updates an `aria-live` region) whenever users toggle core application states like View Mode, Year, or Basemap to provide immediate audible feedback.
+
+## 2026-04-03 - Human-Readable Labels for Dynamic aria-live Announcements
+**Learning:** When using internal program keys or variable names (like 'pswipe' or 'yswipe') dynamically to build `aria-live` announcements (e.g. "View mode set to pswipe"), it creates confusing and unnatural audio output for screen reader users.
+**Action:** Always map internal programmatic keys to human-readable strings (like 'PEI Swipe' or 'Year Swipe') before passing them into `aria-live` regions or announcement functions to ensure meaningful contextual feedback.
