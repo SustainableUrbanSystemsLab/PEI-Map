@@ -557,7 +557,14 @@ function setMode(m) {
     if (['pswipe', 'yswipe'].includes(m)) { teardownSplit(); initSplit(); }
     else { teardownSplit(); updateLayer(); }
     updateLegend();
-    announce(`View mode set to ${m}`);
+
+    const modeNames = {
+        'single': 'Single',
+        'diff': 'PEI Diff',
+        'pswipe': 'PEI Swipe',
+        'yswipe': 'Year Swipe'
+    };
+    announce(`View mode set to ${modeNames[m] || m}`);
 }
 
 // ════════════════════════ YEAR ════════════════════════
