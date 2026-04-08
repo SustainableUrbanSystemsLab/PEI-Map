@@ -79,3 +79,7 @@
 ## 2026-04-03 - Human-Readable Labels for Dynamic aria-live Announcements
 **Learning:** When using internal program keys or variable names (like 'pswipe' or 'yswipe') dynamically to build `aria-live` announcements (e.g. "View mode set to pswipe"), it creates confusing and unnatural audio output for screen reader users.
 **Action:** Always map internal programmatic keys to human-readable strings (like 'PEI Swipe' or 'Year Swipe') before passing them into `aria-live` regions or announcement functions to ensure meaningful contextual feedback.
+
+## 2026-04-04 - Audible Confirmations for Map State Dropdowns
+**Learning:** When users change map configuration via `<select>` dropdowns (like choosing a dataset to display), the visual map immediately updates, but screen reader users receive no audible feedback that the background map view actually changed since the change doesn't cause a page reload or a focus shift.
+**Action:** When creating `<select>` dropdowns that change the app state visually in the background without shifting focus, attach a `change` event listener to explicitly announce the new state to an `aria-live` region so screen reader users get confirmation of their action.
