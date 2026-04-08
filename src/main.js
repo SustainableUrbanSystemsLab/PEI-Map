@@ -366,7 +366,12 @@ sidebarEl?.addEventListener('click', (e) => {
 });
 sidebarEl?.addEventListener('change', (e) => {
     const target = e.target;
-    if (mobileMq.matches && target instanceof Element && target.tagName === 'SELECT') setSidebarOpen(false);
+    if (target instanceof HTMLSelectElement) {
+        const prev = target.previousElementSibling;
+        const labelText = prev && (prev.classList.contains('lbl') || prev.classList.contains('sub-lbl')) ? prev.textContent : '';
+        announce(`${labelText ? labelText + ' ' : ''}set to ${target.options[target.selectedIndex].text}`);
+        if (mobileMq.matches) setSidebarOpen(false);
+    }
 });
 window.addEventListener('resize', () => { if (!mobileMq.matches) setSidebarOpen(false); });
 document.addEventListener('keydown', (e) => {
