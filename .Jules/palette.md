@@ -83,3 +83,7 @@
 ## 2026-04-04 - Audible Confirmations for Map State Dropdowns
 **Learning:** When users change map configuration via `<select>` dropdowns (like choosing a dataset to display), the visual map immediately updates, but screen reader users receive no audible feedback that the background map view actually changed since the change doesn't cause a page reload or a focus shift.
 **Action:** When creating `<select>` dropdowns that change the app state visually in the background without shifting focus, attach a `change` event listener to explicitly announce the new state to an `aria-live` region so screen reader users get confirmation of their action.
+
+## 2024-05-18 - Dynamically Injected Mapbox Control Accessibility
+**Learning:** Third-party Mapbox GL JS plugins (like MapboxGeocoder) dynamically inject UI controls into the DOM. Mapbox does not always provide native APIs to configure all accessibility attributes (like `title` for hover tooltips) during initialization.
+**Action:** When applying accessibility enhancements (such as ARIA attributes or tooltips) to third-party Mapbox GL JS UI controls, use `document.querySelector` to target their specific injected classes (e.g., `.mapboxgl-ctrl-geocoder--input`) immediately after calling `map.addControl()` to patch the missing attributes.
