@@ -50,12 +50,12 @@
         <div class="sec" role="group" aria-labelledby="lbl-mode">
             <div class="lbl" id="lbl-mode">View Mode</div>
             <div class="br">
-                <button class="btn on" id="m-single" aria-pressed="true" onclick="setMode('single')">Single</button>
-                <button class="btn" id="m-diff" aria-pressed="false" onclick="setMode('diff')">PEI Diff</button>
+                <button class="btn on" id="m-single" aria-pressed="true" title="View a single metric layer" onclick="setMode('single')">Single</button>
+                <button class="btn" id="m-diff" aria-pressed="false" title="View the score difference between two metrics" onclick="setMode('diff')">PEI Diff</button>
             </div>
             <div class="br" style="margin-top:4px">
-                <button class="btn" id="m-pswipe" aria-pressed="false" onclick="setMode('pswipe')"><span aria-hidden="true">⇔</span> PEI Swipe</button>
-                <button class="btn" id="m-yswipe" aria-pressed="false" onclick="setMode('yswipe')"><span aria-hidden="true">⇔</span> Year Swipe</button>
+                <button class="btn" id="m-pswipe" aria-pressed="false" title="Swipe to compare two metrics" onclick="setMode('pswipe')"><span aria-hidden="true">⇔</span> PEI Swipe</button>
+                <button class="btn" id="m-yswipe" aria-pressed="false" title="Swipe to compare two years" onclick="setMode('yswipe')"><span aria-hidden="true">⇔</span> Year Swipe</button>
             </div>
         </div>
 
@@ -187,13 +187,13 @@
         <div class="sec" role="group" aria-labelledby="lbl-theme" aria-describedby="theme-hint">
             <div class="lbl" id="lbl-theme">Theme + Basemap</div>
             <div class="br">
-                <button class="btn" id="b-auto" aria-pressed="false" onclick="setMapTheme('auto')">Auto</button>
-                <button class="btn on" id="b-light" aria-pressed="true" onclick="setMapTheme('light')">Light</button>
-                <button class="btn" id="b-dark" aria-pressed="false" onclick="setMapTheme('dark')">Dark</button>
+                <button class="btn" id="b-auto" aria-pressed="false" title="Sync theme with system preference" onclick="setMapTheme('auto')">Auto</button>
+                <button class="btn on" id="b-light" aria-pressed="true" title="Use light theme and basemap" onclick="setMapTheme('light')">Light</button>
+                <button class="btn" id="b-dark" aria-pressed="false" title="Use dark theme and basemap" onclick="setMapTheme('dark')">Dark</button>
             </div>
             <div class="br" style="margin-top:4px">
-                <button class="btn" id="b-satellite" aria-pressed="false" onclick="setBase('satellite')">Sat</button>
-                <button class="btn" id="b-streets" aria-pressed="false" onclick="setBase('streets')">Streets</button>
+                <button class="btn" id="b-satellite" aria-pressed="false" title="Satellite basemap" onclick="setBase('satellite')">Sat</button>
+                <button class="btn" id="b-streets" aria-pressed="false" title="Street basemap" onclick="setBase('streets')">Streets</button>
             </div>
             <p class="hint" id="theme-hint">Auto, Light, and Dark sync the app theme and basemap together.</p>
         </div>

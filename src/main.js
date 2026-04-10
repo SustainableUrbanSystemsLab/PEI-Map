@@ -438,6 +438,12 @@ const geocoder = new MapboxGeocoder({
 });
 map.addControl(geocoder, 'top-left');
 
+// 🎨 Palette: Add tooltip to expose the global keyboard shortcut
+const geocoderInput = document.querySelector('.mapboxgl-ctrl-geocoder--input');
+if (geocoderInput) {
+    geocoderInput.setAttribute('title', 'Search location (Press /)');
+}
+
 // Add Scale Control
 map.addControl(new mapboxgl.ScaleControl({ maxWidth: 200, unit: 'imperial' }), 'bottom-left');
 map.on('click', closeSidebarIfMobile);
