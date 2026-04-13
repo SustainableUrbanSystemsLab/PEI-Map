@@ -29,11 +29,15 @@
     <!-- ⚡ Bolt: Defer large Mapbox scripts to prevent blocking HTML parsing and First Contentful Paint -->
     <script defer src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
-    <script defer src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+    <script defer
+        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css"
         rel="stylesheet" />
-    <script defer src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css" />
+    <script defer
+        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet"
+        href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+        type="text/css" />
 </head>
 
 <body>
@@ -50,12 +54,16 @@
         <div class="sec" role="group" aria-labelledby="lbl-mode">
             <div class="lbl" id="lbl-mode">View Mode</div>
             <div class="br">
-                <button class="btn on" id="m-single" aria-pressed="true" title="View a single metric layer" onclick="setMode('single')">Single</button>
-                <button class="btn" id="m-diff" aria-pressed="false" title="View the score difference between two metrics" onclick="setMode('diff')">PEI Diff</button>
+                <button class="btn on" id="m-single" aria-pressed="true" title="View a single metric layer"
+                    onclick="setMode('single')">Single</button>
+                <button class="btn" id="m-diff" aria-pressed="false"
+                    title="View the score difference between two metrics" onclick="setMode('diff')">PEI Diff</button>
             </div>
             <div class="br" style="margin-top:4px">
-                <button class="btn" id="m-pswipe" aria-pressed="false" title="Swipe to compare two metrics" onclick="setMode('pswipe')"><span aria-hidden="true">⇔</span> PEI Swipe</button>
-                <button class="btn" id="m-yswipe" aria-pressed="false" title="Swipe to compare two years" onclick="setMode('yswipe')"><span aria-hidden="true">⇔</span> Year Swipe</button>
+                <button class="btn" id="m-pswipe" aria-pressed="false" title="Swipe to compare two metrics"
+                    onclick="setMode('pswipe')"><span aria-hidden="true">⇔</span> PEI Swipe</button>
+                <button class="btn" id="m-yswipe" aria-pressed="false" title="Swipe to compare two years"
+                    onclick="setMode('yswipe')"><span aria-hidden="true">⇔</span> Year Swipe</button>
             </div>
         </div>
 
@@ -84,6 +92,7 @@
                 </optgroup>
                 <optgroup label="New Indices">
                     <option value="RSI">Road Safety (RSI)</option>
+                    <option value="RSI_new">New Road Safety (RSI_new)</option>
                     <option value="GSI">Green Space (GSI)</option>
                     <option value="BI">Bike Infrastructure (BI)</option>
                     <option value="PTAL">Public Transit Access (PTAL)</option>
@@ -98,13 +107,15 @@
                 <option value="orig-new">Original − New</option>
                 <option value="orig-comb">Original − Combined</option>
             </select>
-            <p class="hint" id="diff-hint"><span aria-hidden="true">🟢</span> Green = new indices improve score<br><span aria-hidden="true">🔴</span> Red = new indices reduce score</p>
+            <p class="hint" id="diff-hint"><span aria-hidden="true">🟢</span> Green = new indices improve score<br><span
+                    aria-hidden="true">🔴</span> Red = new indices reduce score</p>
         </div>
 
         <!-- PEI SWIPE controls -->
         <div class="sec" id="ctl-pswipe" style="display:none">
             <div class="lbl" id="lbl-pswipe-year">Year</div>
-            <div class="br" id="ps-yr-btns" role="group" aria-labelledby="lbl-pswipe-year" aria-describedby="pswipe-hint">
+            <div class="br" id="ps-yr-btns" role="group" aria-labelledby="lbl-pswipe-year"
+                aria-describedby="pswipe-hint">
                 <button class="btn on" id="ps-2013" aria-pressed="true" onclick="setPSwipeYear('2013')">2013</button>
                 <button class="btn" id="ps-2017" aria-pressed="false" onclick="setPSwipeYear('2017')">2017</button>
                 <button class="btn" id="ps-2022" aria-pressed="false" onclick="setPSwipeYear('2022')">2022</button>
@@ -122,6 +133,7 @@
                 </optgroup>
                 <optgroup label="New Indices">
                     <option value="RSI">RSI</option>
+                    <option value="RSI_new">RSI_new</option>
                     <option value="GSI">GSI</option>
                     <option value="BI">BI</option>
                     <option value="PTAL">PTAL</option>
@@ -140,12 +152,14 @@
                 </optgroup>
                 <optgroup label="New Indices">
                     <option value="RSI">RSI</option>
+                    <option value="RSI_new">RSI_new</option>
                     <option value="GSI">GSI</option>
                     <option value="BI">BI</option>
                     <option value="PTAL">PTAL</option>
                 </optgroup>
             </select>
-            <p class="hint" id="pswipe-hint" style="margin-top:6px">Drag the divider to compare maps side by side at the same location.</p>
+            <p class="hint" id="pswipe-hint" style="margin-top:6px">Drag the divider to compare maps side by side at the
+                same location.</p>
         </div>
 
         <!-- YEAR SWIPE controls -->
@@ -163,6 +177,7 @@
                 </optgroup>
                 <optgroup label="New Indices">
                     <option value="RSI">RSI</option>
+                    <option value="RSI_new">RSI_new</option>
                     <option value="GSI">GSI</option>
                     <option value="BI">BI</option>
                     <option value="PTAL">PTAL</option>
@@ -180,20 +195,26 @@
                 <option value="2017">2017</option>
                 <option value="2013">2013</option>
             </select>
-            <p class="hint" id="yswipe-hint" style="margin-top:6px">Drag the divider to compare years side by side at the same location.</p>
+            <p class="hint" id="yswipe-hint" style="margin-top:6px">Drag the divider to compare years side by side at
+                the same location.</p>
         </div>
 
         <!-- BASEMAP -->
         <div class="sec" role="group" aria-labelledby="lbl-theme" aria-describedby="theme-hint">
             <div class="lbl" id="lbl-theme">Theme + Basemap</div>
             <div class="br">
-                <button class="btn" id="b-auto" aria-pressed="false" title="Sync theme with system preference" onclick="setMapTheme('auto')">Auto</button>
-                <button class="btn on" id="b-light" aria-pressed="true" title="Use light theme and basemap" onclick="setMapTheme('light')">Light</button>
-                <button class="btn" id="b-dark" aria-pressed="false" title="Use dark theme and basemap" onclick="setMapTheme('dark')">Dark</button>
+                <button class="btn" id="b-auto" aria-pressed="false" title="Sync theme with system preference"
+                    onclick="setMapTheme('auto')">Auto</button>
+                <button class="btn on" id="b-light" aria-pressed="true" title="Use light theme and basemap"
+                    onclick="setMapTheme('light')">Light</button>
+                <button class="btn" id="b-dark" aria-pressed="false" title="Use dark theme and basemap"
+                    onclick="setMapTheme('dark')">Dark</button>
             </div>
             <div class="br" style="margin-top:4px">
-                <button class="btn" id="b-satellite" aria-pressed="false" title="Satellite basemap" onclick="setBase('satellite')">Sat</button>
-                <button class="btn" id="b-streets" aria-pressed="false" title="Street basemap" onclick="setBase('streets')">Streets</button>
+                <button class="btn" id="b-satellite" aria-pressed="false" title="Satellite basemap"
+                    onclick="setBase('satellite')">Sat</button>
+                <button class="btn" id="b-streets" aria-pressed="false" title="Street basemap"
+                    onclick="setBase('streets')">Streets</button>
             </div>
             <p class="hint" id="theme-hint">Auto, Light, and Dark sync the app theme and basemap together.</p>
         </div>
@@ -211,7 +232,8 @@
 
     <!-- MAP -->
     <div id="mw" role="main">
-        <button id="sb-toggle" type="button" title="Open controls" aria-controls="sb" aria-expanded="false">Controls</button>
+        <button id="sb-toggle" type="button" title="Open controls" aria-controls="sb"
+            aria-expanded="false">Controls</button>
         <button id="reset-view" type="button" title="Reset map view (Press R)">Reset View</button>
         <div id="ld" role="status" aria-live="polite">
             <div class="spin"></div>
