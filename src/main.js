@@ -30,7 +30,7 @@ const DIFF_GRAD = [-0.5, '#1a9850', -0.1, '#91cf60', 0, '#ffffbf', 0.1, '#fc8d59
 const PEI_LABELS = {
     PEI_original: 'PEI Original', PEI_new: 'PEI New', PEI_combined: 'PEI Combined',
     CDI: 'Commercial Density', IDI: 'Intersection Density', LDI: 'Land Use Diversity', PDI: 'Population Density',
-    RSI: 'Road Safety Index', GSI: 'Green Space Index', BI: 'Bike Infrastructure', PTAL: 'Public Transit Access'
+    RSI: 'Road Safety Index', RSI_new: 'New Road Safety (RSI_new)', GSI: 'Green Space Index', BI: 'Bike Infrastructure', PTAL: 'Public Transit Access'
 };
 const STATE_FIPS_NAMES = {
     '01': 'Alabama', '02': 'Alaska', '04': 'Arizona', '05': 'Arkansas', '06': 'California', '08': 'Colorado',
