@@ -46,7 +46,7 @@
     <div id="sb" role="complementary" aria-label="Dashboard Controls">
         <div class="sbh">
             <button id="sb-close" type="button" title="Close controls (Esc)" aria-label="Close controls">Close</button>
-            <h1><span aria-hidden="true">🗺</span>&nbsp; PEI Dashboard</h1>
+            <h1><span aria-hidden="true">🗺</span>&nbsp; PEI Dashboard <button type="button" onclick="document.getElementById('info-modal').showModal()" style="background:none; border:none; cursor:pointer; font-size:18px; padding:0; margin-left:8px; vertical-align:middle; filter:grayscale(1) brightness(1.2);" title="About this Project" aria-label="About this Project">ℹ️</button></h1>
             <p>Pedestrian Environment Index · Nationwide</p>
         </div>
 
@@ -258,6 +258,28 @@
             <div class="ll" id="leg-l"><span>0.0</span><span>0.5</span><span>1.0</span></div>
         </div>
     </div>
+
+    <dialog id="info-modal" style="padding: 24px; border: none; border-radius: 12px; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: var(--bg-color, #ffffff); color: var(--text-color, #1a1a1a); font-family: inherit;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color, #eeeeee); padding-bottom: 10px; margin-bottom: 16px;">
+            <h2 style="margin: 0; font-size: 1.25rem;">About the PEI Dashboard</h2>
+            <button onclick="this.closest('dialog').close()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: inherit; opacity: 0.6; line-height: 1;">&times;</button>
+        </div>
+        <div style="font-size: 0.95rem; line-height: 1.5;">
+            <p style="margin-top: 0;">The <strong>Pedestrian Environment Index (PEI)</strong> is a nationwide metric designed to evaluate the walkability and safety of pedestrian infrastructure across the United States.</p>
+            <p>This interactive dashboard visualizes eight core built environment indices:</p>
+            <ul style="padding-left: 20px; margin-bottom: 16px;">
+                <li>Commercial Density &amp; Intersection Density</li>
+                <li>Land Use Diversity &amp; Population Density</li>
+                <li>Road Safety (RSI &amp; RSI_new)</li>
+                <li>Green Space &amp; Bike Infrastructure</li>
+                <li>Public Transit Access (PTAL)</li>
+            </ul>
+            <p style="margin-bottom: 0;">Use the swipe tools and layer selectors to track structural changes across 2013, 2017, and 2022.</p>
+        </div>
+        <div style="margin-top: 24px; text-align: right;">
+            <button class="btn on" style="padding: 6px 14px; font-weight: 500;" onclick="this.closest('dialog').close()">Got it</button>
+        </div>
+    </dialog>
 
     <script type="module" src="/src/main.js"></script>
 </body>
