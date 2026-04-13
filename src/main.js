@@ -232,6 +232,7 @@ function buildPopupHtml(state, activeYear) {
       <div class="pr"><span class="pk"><abbr title="Land Use Diversity Index" style="text-decoration: underline dotted; cursor: help">LDI</abbr></span><span class="pv">${f(p.LDI)}</span></div>
       <div class="pr"><span class="pk"><abbr title="Population Density Index" style="text-decoration: underline dotted; cursor: help">PDI</abbr></span><span class="pv">${f(p.PDI)}</span></div>
       <div class="pr"><span class="pk"><abbr title="Road Safety Index" style="text-decoration: underline dotted; cursor: help">RSI</abbr></span><span class="pv">${f(p.RSI)}</span></div>
+      <div class="pr"><span class="pk"><abbr title="New Road Safety Index" style="text-decoration: underline dotted; cursor: help">RSI_new</abbr></span><span class="pv">${f(p.RSI_new)}</span></div>
       <div class="pr"><span class="pk"><abbr title="Green Space Index" style="text-decoration: underline dotted; cursor: help">GSI</abbr></span><span class="pv">${f(p.GSI)}</span></div>
       <div class="pr"><span class="pk"><abbr title="Bike Infrastructure Index" style="text-decoration: underline dotted; cursor: help">BI</abbr></span><span class="pv">${f(p.BI)}</span></div>
       <div class="pr"><span class="pk"><abbr title="Public Transit Access Level" style="text-decoration: underline dotted; cursor: help">PTAL</abbr></span><span class="pv">${f(p.PTAL)}</span></div>
