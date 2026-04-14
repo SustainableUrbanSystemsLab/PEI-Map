@@ -183,7 +183,8 @@ input[type='range']:focus-visible,
 .ptab:focus-visible,
 .mapboxgl-popup-close-button:focus-visible,
 .mapboxgl-ctrl-group button:focus-visible,
-.compare-swiper-vertical:focus-visible {
+.compare-swiper-vertical:focus-visible,
+.dialog-close:focus-visible {
     outline: 2px solid var(--acc);
     outline-offset: 2px
 }
