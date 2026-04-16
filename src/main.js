@@ -361,6 +361,22 @@ function closeSidebarIfMobile() {
 sidebarToggleBtn?.addEventListener('click', () => setSidebarOpen(!bodyEl.classList.contains('sb-open')));
 sidebarCloseBtn?.addEventListener('click', () => setSidebarOpen(false));
 sidebarBackdrop?.addEventListener('click', () => setSidebarOpen(false));
+
+const infoModal = document.getElementById('info-modal');
+if (infoModal) {
+    infoModal.addEventListener('click', (e) => {
+        const dialogDimensions = infoModal.getBoundingClientRect();
+        if (
+            e.clientX < dialogDimensions.left ||
+            e.clientX > dialogDimensions.right ||
+            e.clientY < dialogDimensions.top ||
+            e.clientY > dialogDimensions.bottom
+        ) {
+            infoModal.close();
+        }
+    });
+}
+
 sidebarEl?.addEventListener('click', (e) => {
     const target = e.target;
     if (mobileMq.matches && target instanceof Element && target.closest('button.btn')) setSidebarOpen(false);
@@ -379,6 +395,12 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
             e.target.blur();
+            return;
+        }
+        const infoModal = document.getElementById('info-modal');
+        if (infoModal && infoModal.open) {
+            // Native dialog closes on Escape, so we just return early
+            // to avoid also closing the sidebar via setSidebarOpen(false).
             return;
         }
         if (popup.isOpen()) {
