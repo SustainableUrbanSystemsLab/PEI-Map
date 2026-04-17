@@ -46,7 +46,7 @@
     <div id="sb" role="complementary" aria-label="Dashboard Controls">
         <div class="sbh">
             <button id="sb-close" type="button" title="Close controls (Esc)" aria-label="Close controls">Close</button>
-            <h1><span aria-hidden="true">🗺</span>&nbsp; PEI Dashboard <button type="button" onclick="document.getElementById('info-modal').showModal()" style="background:none; border:none; cursor:pointer; font-size:18px; padding:0; margin-left:8px; vertical-align:middle; filter:grayscale(1) brightness(1.2);" title="About this Project" aria-label="About this Project">ℹ️</button></h1>
+            <h1><span aria-hidden="true">🗺</span>&nbsp; PEI Dashboard <button type="button" class="info-btn" onclick="document.getElementById('info-modal').showModal()" title="About this Project (Press ?)" aria-label="About this Project">ℹ️</button></h1>
             <p>Pedestrian Environment Index · Nationwide</p>
         </div>
 
@@ -262,7 +262,7 @@
     <dialog id="info-modal" aria-labelledby="info-modal-title" style="padding: 24px; border: none; border-radius: 12px; max-width: 480px; box-shadow: var(--shadow-lg); background: var(--panel); color: var(--txt); font-family: inherit;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bdr); padding-bottom: 10px; margin-bottom: 16px;">
             <h2 id="info-modal-title" style="margin: 0; font-size: 1.25rem;">About the PEI Dashboard</h2>
-            <button class="dialog-close" aria-label="Close dialog" title="Close dialog" onclick="this.closest('dialog').close()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: inherit; opacity: 0.6; line-height: 1;">&times;</button>
+            <button class="dialog-close" aria-label="Close dialog" title="Close dialog (Esc)" onclick="this.closest('dialog').close()">&times;</button>
         </div>
         <div style="font-size: 0.95rem; line-height: 1.5;">
             <p style="margin-top: 0;">The <strong>Pedestrian Environment Index (PEI)</strong> is a nationwide metric designed to evaluate the walkability and safety of pedestrian infrastructure across the United States.</p>
@@ -276,7 +276,15 @@
             </ul>
             <p>Use the swipe tools and layer selectors to track structural changes across 2013, 2017, and 2022.</p>
             <p><em>More features are to come, including demographic data overlays and additional timeline years!</em></p>
-            <p style="margin-bottom: 0;">For more information on how each index was calculated, please visit: <a href="https://vip-smur.github.io/25fa-mobility/" target="_blank" rel="noopener noreferrer" style="color: var(--acc);">https://vip-smur.github.io/25fa-mobility/</a></p>
+            <p style="margin-bottom: 16px;">For more information on how each index was calculated, please visit: <a href="https://vip-smur.github.io/25fa-mobility/" target="_blank" rel="noopener noreferrer" style="color: var(--acc);">https://vip-smur.github.io/25fa-mobility/</a></p>
+
+            <h3 style="font-size: 1rem; margin-bottom: 8px;">Keyboard Shortcuts</h3>
+            <ul class="kbd-list" style="padding-left: 0; margin-bottom: 0; list-style-type: none;">
+                <li><kbd>?</kbd> Show this info dialog</li>
+                <li><kbd>/</kbd> Search location</li>
+                <li><kbd>R</kbd> Reset map view</li>
+                <li><kbd>Esc</kbd> Close dialogs or controls</li>
+            </ul>
         </div>
         <div style="margin-top: 24px; text-align: right;">
             <button class="btn on" style="padding: 6px 14px; font-weight: 500;" onclick="this.closest('dialog').close()">Got it</button>
