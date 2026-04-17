@@ -419,6 +419,13 @@ document.addEventListener('keydown', (e) => {
             searchInput.focus();
         }
     }
+    if (e.key === '?' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+        const infoModal = document.getElementById('info-modal');
+        if (infoModal && !infoModal.open) {
+            e.preventDefault();
+            infoModal.showModal();
+        }
+    }
     if (e.key.toLowerCase() === 'r' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
         e.preventDefault();
         resetViewBtn?.click();
