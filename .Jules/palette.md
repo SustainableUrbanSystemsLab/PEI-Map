@@ -97,3 +97,7 @@
 ## 2024-05-19 - Native Dialog Backdrop Closing
 **Learning:** Native HTML `<dialog>` elements do not close automatically when users click the backdrop, which violates common UX expectations. Furthermore, using `Escape` to close native dialogs can unexpectedly trigger other global `Escape` listeners (like closing a sidebar) if not explicitly checked and handled.
 **Action:** When using `<dialog>`, always add a standard click listener comparing `clientX`/`clientY` to `getBoundingClientRect()` to enable backdrop closing. Also, ensure global `Escape` listeners check if a dialog is `open` and return early to prevent cascading close actions.
+
+## 2024-05-19 - Clarified Domain-Specific Acronyms in Map UI
+**Learning:** Obscure domain-specific acronyms (like CDI, GSI, PTAL) used in primary controls force users to either guess their meaning or repeatedly consult external documentation or popups. This is a common accessibility and usability trap in scientific/data dashboards.
+**Action:** When working on data visualizations, always expand acronyms in dropdowns and legends (e.g., "Commercial Density (CDI)") to provide immediate context without sacrificing technical accuracy.
