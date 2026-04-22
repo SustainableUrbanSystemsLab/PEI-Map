@@ -101,3 +101,7 @@
 ## 2024-05-19 - Clarified Domain-Specific Acronyms in Map UI
 **Learning:** Obscure domain-specific acronyms (like CDI, GSI, PTAL) used in primary controls force users to either guess their meaning or repeatedly consult external documentation or popups. This is a common accessibility and usability trap in scientific/data dashboards.
 **Action:** When working on data visualizations, always expand acronyms in dropdowns and legends (e.g., "Commercial Density (CDI)") to provide immediate context without sacrificing technical accuracy.
+
+## 2026-04-22 - Missing Tooltips on Dynamically Injected Mapbox Controls
+**Learning:** Mapbox GL JS plugins (like MapboxGeocoder) dynamically inject UI controls, such as the search input and clear button. These controls often lack necessary accessibility attributes, such as a `title` attribute for tooltips, which hurts usability for sighted users who rely on hover context, and also power users who need to know keyboard shortcuts.
+**Action:** When initializing third-party Mapbox controls, always query the DOM for their specific injected classes (e.g., `.mapboxgl-ctrl-geocoder--button`) and manually add missing accessibility attributes like `title` immediately after calling `map.addControl()`.

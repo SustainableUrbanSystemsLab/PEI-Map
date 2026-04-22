@@ -474,6 +474,12 @@ if (geocoderInput) {
     geocoderInput.setAttribute('title', 'Search location (Press /)');
 }
 
+// 🎨 Palette: Add tooltip to geocoder clear button
+const geocoderClearBtn = document.querySelector('.mapboxgl-ctrl-geocoder--button');
+if (geocoderClearBtn) {
+    geocoderClearBtn.setAttribute('title', 'Clear search');
+}
+
 // Add Scale Control
 map.addControl(new mapboxgl.ScaleControl({ maxWidth: 200, unit: 'imperial' }), 'bottom-left');
 map.on('click', closeSidebarIfMobile);
