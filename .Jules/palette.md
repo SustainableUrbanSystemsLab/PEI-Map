@@ -105,3 +105,7 @@
 ## 2026-04-22 - Missing Tooltips on Dynamically Injected Mapbox Controls
 **Learning:** Mapbox GL JS plugins (like MapboxGeocoder) dynamically inject UI controls, such as the search input and clear button. These controls often lack necessary accessibility attributes, such as a `title` attribute for tooltips, which hurts usability for sighted users who rely on hover context, and also power users who need to know keyboard shortcuts.
 **Action:** When initializing third-party Mapbox controls, always query the DOM for their specific injected classes (e.g., `.mapboxgl-ctrl-geocoder--button`) and manually add missing accessibility attributes like `title` immediately after calling `map.addControl()`.
+
+## 2026-04-26 - Missing Tooltips on Dynamically Injected Mapbox Popup Close Buttons
+**Learning:** Mapbox GL JS popups dynamically inject a close button. These controls lack a `title` attribute for tooltips, which hurts usability for sighted users who rely on hover context, and also power users who need to know keyboard shortcuts (like Esc).
+**Action:** When initializing Mapbox popups, always query the DOM for the injected `.mapboxgl-popup-close-button` and manually add the missing `title` attribute (e.g., 'Close popup (Esc)') immediately after calling `popup.addTo(map)`.
