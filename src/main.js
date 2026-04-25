@@ -869,6 +869,13 @@ function onTractClick(e) {
         activeYear: year
     };
     popup.setLngLat(e.lngLat).setHTML(buildPopupHtml(popupState, year)).addTo(map);
+
+    // 🎨 Palette: Add accessibility attributes to Mapbox popup close button
+    const popupCloseBtn = document.querySelector('.mapboxgl-popup-close-button');
+    if (popupCloseBtn) {
+        popupCloseBtn.setAttribute('title', 'Close popup (Esc)');
+        popupCloseBtn.setAttribute('aria-label', 'Close popup');
+    }
 }
 
 function lerp3(c0, cMid, c1, t) {
