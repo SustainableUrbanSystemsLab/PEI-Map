@@ -703,18 +703,29 @@ function initSplit() {
             swiperHandle.setAttribute('aria-valuemin', '0');
             swiperHandle.setAttribute('aria-valuemax', '100');
             swiperHandle.setAttribute('aria-valuenow', '50');
-            swiperHandle.setAttribute('aria-label', 'Map comparison slider. Use left and right arrow keys to adjust.');
+            swiperHandle.setAttribute('aria-label', 'Map comparison slider. Use arrow keys to adjust.');
 
             swiperHandle.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
+                if (keys.includes(e.key)) {
                     e.preventDefault();
-                    // Get current pixel position from plugin's state or compute based on style
                     const cmpRect = document.getElementById('cmp').getBoundingClientRect();
                     const currentPx = cmpObj.currentPosition;
+                    let nextPx = currentPx;
 
-                    // Move by 5% of container width
-                    const stepPx = cmpRect.width * 0.05;
-                    let nextPx = e.key === 'ArrowLeft' ? currentPx - stepPx : currentPx + stepPx;
+                    if (e.key === 'Home') {
+                        nextPx = 0;
+                    } else if (e.key === 'End') {
+                        nextPx = cmpRect.width;
+                    } else {
+                        const stepPercent = (e.key === 'PageUp' || e.key === 'PageDown') ? 0.10 : 0.05;
+                        const stepPx = cmpRect.width * stepPercent;
+                        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === 'PageDown') {
+                            nextPx = currentPx - stepPx;
+                        } else {
+                            nextPx = currentPx + stepPx;
+                        }
+                    }
 
                     // Clamp to container bounds
                     nextPx = Math.max(0, Math.min(nextPx, cmpRect.width));

@@ -109,3 +109,7 @@
 ## 2026-04-26 - Missing Tooltips on Dynamically Injected Mapbox Popup Close Buttons
 **Learning:** Mapbox GL JS popups dynamically inject a close button. These controls lack a `title` attribute for tooltips, which hurts usability for sighted users who rely on hover context, and also power users who need to know keyboard shortcuts (like Esc).
 **Action:** When initializing Mapbox popups, always query the DOM for the injected `.mapboxgl-popup-close-button` and manually add the missing `title` attribute (e.g., 'Close popup (Esc)') immediately after calling `popup.addTo(map)`.
+
+## 2026-05-15 - ARIA Slider Full Keyboard Coverage
+**Learning:** Adding a `role="slider"` and supporting simple `ArrowLeft` and `ArrowRight` is not sufficient for full WCAG compliance. Screen reader and keyboard power users expect sliders to support `ArrowUp`/`ArrowDown` for consistency, `PageUp`/`PageDown` for larger increment jumps (e.g. 10%), and `Home`/`End` to quickly jump to the minimum and maximum extremes.
+**Action:** When implementing custom ARIA sliders (like map comparison handles), ensure you implement the full suite of standard keyboard interactions (`ArrowUp`/`Down`, `PageUp`/`Down`, `Home`, `End`) to provide an expected and fully accessible experience.
