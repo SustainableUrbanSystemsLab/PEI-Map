@@ -113,3 +113,10 @@
 ## 2026-05-15 - ARIA Slider Full Keyboard Coverage
 **Learning:** Adding a `role="slider"` and supporting simple `ArrowLeft` and `ArrowRight` is not sufficient for full WCAG compliance. Screen reader and keyboard power users expect sliders to support `ArrowUp`/`ArrowDown` for consistency, `PageUp`/`PageDown` for larger increment jumps (e.g. 10%), and `Home`/`End` to quickly jump to the minimum and maximum extremes.
 **Action:** When implementing custom ARIA sliders (like map comparison handles), ensure you implement the full suite of standard keyboard interactions (`ArrowUp`/`Down`, `PageUp`/`Down`, `Home`, `End`) to provide an expected and fully accessible experience.
+## 2024-04-29 - Range Slider ARIA Value Text
+**Learning:** Native `<input type="range">` elements only announce their numeric `value` to screen readers, missing unit context (like `%`). Playwright's `fill()` method may also fail to trigger inline `oninput="..."` handlers on these elements.
+**Action:** Always dynamically sync `aria-valuetext` with the formatted value string to provide unit context, and use `page.evaluate()` to dispatch manual `input` events when verifying them in headless mode.
+
+## 2024-04-29 - Screen Reader Noise Reduction
+**Learning:** Adding floating text labels to the DOM (like '2013' vs '2022' map split identifiers) that duplicate the state of existing accessible dropdowns creates noisy, out-of-context screen reader announcements.
+**Action:** Apply `aria-hidden="true"` to floating decorative elements that visually duplicate state already governed by fully accessible native controls.

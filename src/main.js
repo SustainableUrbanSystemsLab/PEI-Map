@@ -664,7 +664,9 @@ function setMapTheme(mode) {
 // ════════════════════════ OPACITY ════════════════════════
 function setOpacity(v) {
     opacity = v / 100;
-    document.getElementById('opa-v').textContent = v + '%';
+    const percentage = v + '%';
+    document.getElementById('opa-v').textContent = percentage;
+    document.getElementById('opa').setAttribute('aria-valuetext', percentage);
     if (map.getLayer('tracts-fill')) map.setPaintProperty('tracts-fill', 'fill-opacity', opacity);
     [bMap, aMap].forEach(m => { if (m?.getLayer('tracts-fill')) m.setPaintProperty('tracts-fill', 'fill-opacity', opacity); });
 }
@@ -747,6 +749,7 @@ function addSplitLabel(containerId, text) {
     const el = document.createElement('div');
     el.className = 'cmp-year-label';
     el.textContent = text;
+    el.setAttribute('aria-hidden', 'true');
     document.getElementById(containerId).appendChild(el);
 }
 function addSplitLayerByVersion(m, ts, selId, containerId) {
