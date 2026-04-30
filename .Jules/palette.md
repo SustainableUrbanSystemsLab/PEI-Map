@@ -120,3 +120,7 @@
 ## 2024-04-29 - Screen Reader Noise Reduction
 **Learning:** Adding floating text labels to the DOM (like '2013' vs '2022' map split identifiers) that duplicate the state of existing accessible dropdowns creates noisy, out-of-context screen reader announcements.
 **Action:** Apply `aria-hidden="true"` to floating decorative elements that visually duplicate state already governed by fully accessible native controls.
+
+## 2026-05-18 - Forcing aria-live Re-announcements
+**Learning:** `aria-live` regions only announce changes to their content. If a user performs an action that triggers the *exact same* message consecutively (e.g., repeatedly pressing the 'R' shortcut to reset the map view), the screen reader will remain silent after the first announcement because the DOM text hasn't mutated.
+**Action:** When creating global announcement functions, clear the `textContent` of the `aria-live` region first, and use a brief `setTimeout(..., 50)` before injecting the new message to force a DOM mutation and guarantee the screen reader announces it every time.
