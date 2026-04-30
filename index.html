@@ -46,7 +46,7 @@
     <div id="sb" role="complementary" aria-label="Dashboard Controls">
         <div class="sbh">
             <button id="sb-close" type="button" title="Close controls (Esc)" aria-label="Close controls">Close</button>
-            <h1><span aria-hidden="true">🗺</span>&nbsp; PEI Dashboard <button type="button" class="info-btn" onclick="document.getElementById('info-modal').showModal()" title="About this Project (Press ?)" aria-label="About this Project">ℹ️</button></h1>
+            <h1><span aria-hidden="true">🗺</span>&nbsp; PEI Dashboard <button type="button" class="info-btn" onclick="document.getElementById('info-modal').showModal()" title="About this Project (Press ?)" aria-label="About this Project"><span aria-hidden="true">ℹ️</span></button></h1>
             <p>Pedestrian Environment Index · Nationwide</p>
         </div>
 
@@ -262,7 +262,7 @@
     <dialog id="info-modal" aria-labelledby="info-modal-title" style="padding: 24px; border: none; border-radius: 12px; max-width: 480px; box-shadow: var(--shadow-lg); background: var(--panel); color: var(--txt); font-family: inherit;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bdr); padding-bottom: 10px; margin-bottom: 16px;">
             <h2 id="info-modal-title" style="margin: 0; font-size: 1.25rem;">About the PEI Dashboard</h2>
-            <button class="dialog-close" aria-label="Close dialog" title="Close dialog (Esc)" onclick="this.closest('dialog').close()">&times;</button>
+            <button class="dialog-close" aria-label="Close dialog" title="Close dialog (Esc)" onclick="this.closest('dialog').close()"><span aria-hidden="true">&times;</span></button>
         </div>
         <div style="font-size: 0.95rem; line-height: 1.5;">
             <p style="margin-top: 0;">The <strong>Pedestrian Environment Index (PEI)</strong> is a nationwide metric designed to evaluate the walkability and safety of pedestrian infrastructure across the United States.</p>

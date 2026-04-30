@@ -69,7 +69,11 @@ const a11yAnnouncerEl = document.getElementById('a11y-announcer');
 
 function announce(msg) {
     if (a11yAnnouncerEl) {
-        a11yAnnouncerEl.textContent = msg;
+        // Clear text first to force DOM mutation on identical consecutive messages
+        a11yAnnouncerEl.textContent = '';
+        setTimeout(() => {
+            a11yAnnouncerEl.textContent = msg;
+        }, 50);
     }
 }
 
@@ -706,6 +710,7 @@ function initSplit() {
             swiperHandle.setAttribute('aria-valuemax', '100');
             swiperHandle.setAttribute('aria-valuenow', '50');
             swiperHandle.setAttribute('aria-label', 'Map comparison slider. Use arrow keys to adjust.');
+            swiperHandle.setAttribute('title', 'Drag or use arrow keys to adjust');
 
             swiperHandle.addEventListener('keydown', (e) => {
                 const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'];
