@@ -124,3 +124,7 @@
 ## 2026-05-18 - Forcing aria-live Re-announcements
 **Learning:** `aria-live` regions only announce changes to their content. If a user performs an action that triggers the *exact same* message consecutively (e.g., repeatedly pressing the 'R' shortcut to reset the map view), the screen reader will remain silent after the first announcement because the DOM text hasn't mutated.
 **Action:** When creating global announcement functions, clear the `textContent` of the `aria-live` region first, and use a brief `setTimeout(..., 50)` before injecting the new message to force a DOM mutation and guarantee the screen reader announces it every time.
+
+## 2024-03-24 - Native Dialog Backdrop & Animations
+**Learning:** Native `<dialog>` elements lack visual isolation and abrupt appearance without explicit styling. Using `dialog::backdrop` with `rgba` and `backdrop-filter: blur()` significantly improves focus, and applying a `dialog[open]` entry animation makes the interaction feel much smoother.
+**Action:** When using native `<dialog>` tags, always implement a `dialog::backdrop` with dimming/blur and a subtle `dialog[open]` scale/fade entry animation to ensure a polished modal experience.
