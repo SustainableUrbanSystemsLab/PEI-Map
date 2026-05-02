@@ -128,3 +128,7 @@
 ## 2024-03-24 - Native Dialog Backdrop & Animations
 **Learning:** Native `<dialog>` elements lack visual isolation and abrupt appearance without explicit styling. Using `dialog::backdrop` with `rgba` and `backdrop-filter: blur()` significantly improves focus, and applying a `dialog[open]` entry animation makes the interaction feel much smoother.
 **Action:** When using native `<dialog>` tags, always implement a `dialog::backdrop` with dimming/blur and a subtle `dialog[open]` scale/fade entry animation to ensure a polished modal experience.
+
+## 2026-05-20 - Exposing Native Third-Party Keyboard Shortcuts
+**Learning:** Third-party widgets like Mapbox provide native keyboard accessibility (e.g. `+`/`-` for zooming, arrow keys for panning), but users have no way of discovering these without consulting external documentation.
+**Action:** Always expose native third-party keyboard shortcuts in the UI. Append them to the `title` attributes of their corresponding UI buttons (e.g., zoom controls) when initializing plugins, and include them in global 'Keyboard Shortcuts' dialogs to empower power users.

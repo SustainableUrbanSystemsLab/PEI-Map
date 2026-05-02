@@ -463,6 +463,13 @@ async function detectSourceLayers() {
 const map = new mapboxgl.Map({ container: 'map', style: BASES[base], center: DEFAULT_VIEW.center, zoom: DEFAULT_VIEW.zoom, minZoom: 2 });
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
+// 🎨 Palette: Add tooltips to expose native Mapbox keyboard shortcuts
+const zoomInBtn = document.querySelector('.mapboxgl-ctrl-zoom-in');
+if (zoomInBtn) zoomInBtn.setAttribute('title', 'Zoom in (Press +)');
+
+const zoomOutBtn = document.querySelector('.mapboxgl-ctrl-zoom-out');
+if (zoomOutBtn) zoomOutBtn.setAttribute('title', 'Zoom out (Press -)');
+
 // Add Geocoder
 const geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
