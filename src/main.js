@@ -470,6 +470,16 @@ if (zoomInBtn) zoomInBtn.setAttribute('title', 'Zoom in (Press +)');
 const zoomOutBtn = document.querySelector('.mapboxgl-ctrl-zoom-out');
 if (zoomOutBtn) zoomOutBtn.setAttribute('title', 'Zoom out (Press -)');
 
+// 🎨 Palette: Fix Mapbox missing aria-label and titles on icon-only controls
+const attribBtn = document.querySelector('.mapboxgl-ctrl-attrib-button');
+if (attribBtn) {
+    attribBtn.setAttribute('title', 'Toggle attribution');
+    attribBtn.setAttribute('aria-label', 'Toggle attribution');
+}
+
+const compassBtn = document.querySelector('.mapboxgl-ctrl-compass');
+if (compassBtn) compassBtn.setAttribute('title', 'Reset bearing to north');
+
 // Add Geocoder
 const geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,

@@ -132,3 +132,6 @@
 ## 2026-05-20 - Exposing Native Third-Party Keyboard Shortcuts
 **Learning:** Third-party widgets like Mapbox provide native keyboard accessibility (e.g. `+`/`-` for zooming, arrow keys for panning), but users have no way of discovering these without consulting external documentation.
 **Action:** Always expose native third-party keyboard shortcuts in the UI. Append them to the `title` attributes of their corresponding UI buttons (e.g., zoom controls) when initializing plugins, and include them in global 'Keyboard Shortcuts' dialogs to empower power users.
+## 2024-05-06 - [Mapbox Native Controls A11y]
+**Learning:** Native Mapbox GL JS controls (such as the attribution toggle `.mapboxgl-ctrl-attrib-button` and compass `.mapboxgl-ctrl-compass`) lack sufficient accessible names for their icon-only buttons. Screen readers might fail to interpret them properly.
+**Action:** Always query these elements after map initialization and manually inject `title` and `aria-label` attributes to ensure screen reader compatibility and hover tooltips.
