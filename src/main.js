@@ -465,10 +465,16 @@ map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
 // 🎨 Palette: Add tooltips to expose native Mapbox keyboard shortcuts
 const zoomInBtn = document.querySelector('.mapboxgl-ctrl-zoom-in');
-if (zoomInBtn) zoomInBtn.setAttribute('title', 'Zoom in (Press +)');
+if (zoomInBtn) {
+    zoomInBtn.setAttribute('title', 'Zoom in (Press +)');
+    zoomInBtn.setAttribute('aria-keyshortcuts', '+');
+}
 
 const zoomOutBtn = document.querySelector('.mapboxgl-ctrl-zoom-out');
-if (zoomOutBtn) zoomOutBtn.setAttribute('title', 'Zoom out (Press -)');
+if (zoomOutBtn) {
+    zoomOutBtn.setAttribute('title', 'Zoom out (Press -)');
+    zoomOutBtn.setAttribute('aria-keyshortcuts', '-');
+}
 
 // 🎨 Palette: Fix Mapbox missing aria-label and titles on icon-only controls
 const attribBtn = document.querySelector('.mapboxgl-ctrl-attrib-button');
@@ -493,6 +499,7 @@ map.addControl(geocoder, 'top-left');
 const geocoderInput = document.querySelector('.mapboxgl-ctrl-geocoder--input');
 if (geocoderInput) {
     geocoderInput.setAttribute('title', 'Search location (Press /)');
+    geocoderInput.setAttribute('aria-keyshortcuts', '/');
 }
 
 // 🎨 Palette: Add tooltip to geocoder clear button
@@ -911,6 +918,7 @@ function onTractClick(e) {
     if (popupCloseBtn) {
         popupCloseBtn.setAttribute('title', 'Close popup (Esc)');
         popupCloseBtn.setAttribute('aria-label', 'Close popup');
+        popupCloseBtn.setAttribute('aria-keyshortcuts', 'Escape');
     }
 }
 
