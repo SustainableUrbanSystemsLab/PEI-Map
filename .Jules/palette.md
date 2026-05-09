@@ -135,3 +135,7 @@
 ## 2024-05-06 - [Mapbox Native Controls A11y]
 **Learning:** Native Mapbox GL JS controls (such as the attribution toggle `.mapboxgl-ctrl-attrib-button` and compass `.mapboxgl-ctrl-compass`) lack sufficient accessible names for their icon-only buttons. Screen readers might fail to interpret them properly.
 **Action:** Always query these elements after map initialization and manually inject `title` and `aria-label` attributes to ensure screen reader compatibility and hover tooltips.
+
+## 2026-05-22 - Semantic ARIA Key Shortcuts
+**Learning:** While visual tooltips (using the `title` attribute, e.g. "Search location (Press /)") make keyboard shortcuts discoverable for sighted mouse users, screen readers do not natively interpret `title` text as a keyboard shortcut. The semantic way to inform assistive technologies of a shortcut is by using the `aria-keyshortcuts` attribute.
+**Action:** When implementing keyboard shortcuts, always pair the visual `title` hint with a semantic `aria-keyshortcuts` attribute on the focusable UI element so that screen readers can correctly identify and announce the shortcut to users.
