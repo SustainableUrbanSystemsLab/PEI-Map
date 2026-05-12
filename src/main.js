@@ -600,10 +600,14 @@ function diffExpr(c1, c2) { return ['interpolate', ['linear'], ['-', ['coalesce'
 function updateLayer() {
     if (!map.getLayer('tracts-fill')) return;
     let expr;
-    if (mode === 'single') expr = peiExpr(document.getElementById('pei-sel').value);
-    else if (mode === 'diff') {
+    if (mode === 'single') {
+        expr = peiExpr(document.getElementById('pei-sel').value);
+        announce(`Layer set to ${PEI_LABELS[document.getElementById('pei-sel').value] || document.getElementById('pei-sel').value}`);
+    } else if (mode === 'diff') {
         const d = document.getElementById('diff-sel').value;
         expr = d === 'orig-new' ? diffExpr('PEI_original', 'PEI_new') : diffExpr('PEI_original', 'PEI_combined');
+        const diffSelEl = document.getElementById('diff-sel');
+        announce(`Diff set to ${diffSelEl.options[diffSelEl.selectedIndex].text}`);
     }
     if (expr) map.setPaintProperty('tracts-fill', 'fill-color', expr);
     map.setPaintProperty('tracts-fill', 'fill-opacity', opacity);
@@ -658,6 +662,7 @@ function setYear(yr) {
 }
 function setPSwipeYear(yr) {
     pSwipeYear = yr;
+    announce(`PEI Swipe year set to ${yr}`);
     ['2013', '2017', '2022'].forEach(y => {
         const btn = document.getElementById('ps-' + y);
         if (btn) {
@@ -805,7 +810,14 @@ function updateSplit() {
         const rightLabel = document.querySelector('#after-map .cmp-year-label');
         if (leftLabel) leftLabel.textContent = PEI_LABELS[lc] || lc;
         if (rightLabel) rightLabel.textContent = PEI_LABELS[rc] || rc;
-    } else { teardownSplit(); initSplit(); }
+        announce(`Comparing ${PEI_LABELS[lc] || lc} with ${PEI_LABELS[rc] || rc}`);
+    } else {
+        teardownSplit();
+        initSplit();
+        if (mode === 'yswipe') {
+            announce(`Comparing year ${document.getElementById('left-yr').value} with ${document.getElementById('right-yr').value}`);
+        }
+    }
 }
 
 // ════════════════════════ STATS ════════════════════════
