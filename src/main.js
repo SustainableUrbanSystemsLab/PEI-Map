@@ -484,7 +484,10 @@ if (attribBtn) {
 }
 
 const compassBtn = document.querySelector('.mapboxgl-ctrl-compass');
-if (compassBtn) compassBtn.setAttribute('title', 'Reset bearing to north');
+if (compassBtn) {
+    compassBtn.setAttribute('title', 'Reset bearing to north');
+    compassBtn.setAttribute('aria-label', 'Reset bearing to north');
+}
 
 // Add Geocoder
 const geocoder = new MapboxGeocoder({
