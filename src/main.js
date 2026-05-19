@@ -705,6 +705,7 @@ function setOpacity(v) {
     document.getElementById('opa').setAttribute('aria-valuetext', percentage);
     if (map.getLayer('tracts-fill')) map.setPaintProperty('tracts-fill', 'fill-opacity', opacity);
     [bMap, aMap].forEach(m => { if (m?.getLayer('tracts-fill')) m.setPaintProperty('tracts-fill', 'fill-opacity', opacity); });
+    announce(`Layer opacity set to ${percentage}`);
 }
 
 // ════════════════════════ SPLIT / SWIPE ════════════════════════
