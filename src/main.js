@@ -211,7 +211,7 @@ function buildPopupHtml(state, activeYear) {
         }).join('');
         tlRows += `<tr><th scope="row" class="tl-yr"><b>${yr}</b></th>${vals}</tr>`;
     });
-    const yearTabs = yrs.map((yr) => `<button class="ptab${yr === selectedYear ? ' on' : ''}" type="button" aria-pressed="${yr === selectedYear}" onclick="setPopupYear('${yr}')">${yr}</button>`).join('');
+    const yearTabs = yrs.map((yr) => `<button class="ptab${yr === selectedYear ? ' on' : ''}" type="button" role="tab" aria-selected="${yr === selectedYear}" onclick="setPopupYear('${yr}')">${yr}</button>`).join('');
     const demographicsMissing = state.population == null && state.commercial == null && state.intersections == null && state.areaKm2 == null;
     return `
   <div class="ph">
@@ -219,7 +219,7 @@ function buildPopupHtml(state, activeYear) {
     <div class="ploc">${state.countyName}, ${state.stateName}</div>
   </div>
   <div class="pb">
-    <div class="ptabs" role="group" aria-label="Timeline Year">${yearTabs}</div>
+    <div class="ptabs" role="tablist" aria-label="Timeline Year">${yearTabs}</div>
     <div class="pst">PEI Scores — ${selectedYear}</div>
     ${bar('PEI Original', p.PEI_original)}
     ${bar('PEI New', p.PEI_new)}
