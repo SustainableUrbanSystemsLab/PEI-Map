@@ -496,6 +496,18 @@ const geocoder = new MapboxGeocoder({
     marker: false,
     placeholder: 'Search address or place... (Press /)'
 });
+
+// 🎨 Palette: Announce geocoder actions to screen readers
+geocoder.on('result', (e) => {
+    if (e && e.result && e.result.place_name) {
+        announce(`Map moved to ${e.result.place_name}`);
+    }
+});
+
+geocoder.on('clear', () => {
+    announce('Search cleared');
+});
+
 map.addControl(geocoder, 'top-left');
 
 // 🎨 Palette: Add tooltip to expose the global keyboard shortcut
@@ -553,6 +565,7 @@ map.on('load', async () => {
 
     updateLayer(); updateLegend();
     document.getElementById('ld').classList.add('gone');
+    announce('PEI dashboard loaded and ready');
     resetStats();
 });
 
