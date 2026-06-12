@@ -142,3 +142,7 @@
 ## 2024-05-12 - Announcing Map State Changes Visually
 **Learning:** When map modes, layers, or swipe years are changed, these actions dynamically update `<canvas>` rendering or `setPaintProperty` internally, producing no natural DOM events for screen readers to consume. Because these represent complete contextual state changes for the app (like turning a page or switching datasets), they must be explicitly surfaced to a hidden `aria-live` region (`#a11y-announcer`) manually via JavaScript so blind users have parity with sighted users.
 **Action:** When updating map rendering configurations based on form inputs (like `select`), always explicitly call a global `announce()` function mapping the underlying value to a human-readable string (e.g., `PEI_LABELS[val]`) to confirm the state change.
+
+## 2026-05-23 - Mapbox Geocoder Screen Reader Announcements
+**Learning:** The Mapbox Geocoder plugin provides visual map movement and autocomplete when searching, but it does not natively announce the resulting map view changes or clear events to screen readers. Blind users might search for a location and not realize the map successfully panned to it, or when they cleared it.
+**Action:** Always listen to `geocoder.on('result')` and `geocoder.on('clear')` events and manually pass human-readable confirmation strings (like "Map moved to [Place Name]") to a global `aria-live` announcement function to provide auditory feedback for search actions.
